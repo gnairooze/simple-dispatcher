@@ -18,7 +18,7 @@ namespace SimpleDispatcher.Data.Model
         [Required]
         [MaxLength(2048)]
         public string URL { get; set; }
-        [MaxLength(4096)]
+        [MaxLength(2048)]
         public string Headers { get; set; }
         #endregion
     }

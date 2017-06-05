@@ -12,6 +12,7 @@ namespace SimpleDispatcher.Business.Process
     {
         #region attributes
         protected List<Business.View.OperationSettings.ListView> _OperationsSettings;
+        protected List<Business.View.Worker.ListView> _Workers;
         protected List<Data.Model.Request> _DataModelRequests;
 
         static Data.Model.QueueDbContext db = new Data.Model.QueueDbContext();
@@ -24,8 +25,9 @@ namespace SimpleDispatcher.Business.Process
             this.Logger = logger;
             Queue.exec = new Execution(this.Logger);
 
+            loadWorkers();
             loadOperationsSettings();
-
+            
             this.QueueID = queueID;
             this.TopCount = topCount;
         }
@@ -150,6 +152,24 @@ namespace SimpleDispatcher.Business.Process
             logInfo("end loadRequests");
         }
 
+        private void loadWorkers()
+        {
+            logInfo("start loadWorkers");
+
+            var query = from dataModel in Queue.db.Worker
+                        select dataModel;
+
+            _Workers = new List<View.Worker.ListView>();
+
+            foreach (var dataModel in query)
+            {
+                _Workers.Add(new View.Worker.ListView(dataModel));
+            }
+
+            logInfo("workers read from DB to _Workers");
+
+            logInfo("end loadWorkers");
+        }
         private void loadOperationsSettings()
         {
             logInfo("start loadOperationsSettings");

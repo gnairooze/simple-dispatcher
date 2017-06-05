@@ -14,6 +14,7 @@ namespace SimpleDispatcher.Data.Model
 
         public DbSet<Request> Request { get; set; }
         public DbSet<OperationSettings> OperationSettings { get; set; }
+        public DbSet<Worker> Worker { get; set; }
 
     }
 }
