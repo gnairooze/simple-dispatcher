@@ -14,8 +14,6 @@ namespace SimpleDispatcher.Business.Exec.Generic
         public View.Worker.ListView ViewModel { get; set; }
         #endregion
 
-        public event EventHandler<ListView> ExecutionCompleted;
-
         #region consturctors
         public TestExecutionWorker()
         {
@@ -25,26 +23,37 @@ namespace SimpleDispatcher.Business.Exec.Generic
                 ID = 1
             };
         }
+
+        public event EventHandler<ExecutionCompletedEventArgs> ExecutionCompleted;
+        
         #endregion
 
         public bool Execute(Business.View.Request.ListView request)
         {
+            bool result = false;
+
             if(request.ID % 13 != 0)
             {
-                return true;
+                result = true;
             }
-            else
+
+            //trigger the event
+            OnExecutionCompletion(new ExecutionCompletedEventArgs()
             {
-                return false;
-            }
+                Request = request,
+                Worker = this,
+                Succeeded = result
+            });
+
+            return result;
         }
 
-        protected virtual void OnExecutionCompleted(ListView request)
+        public void OnExecutionCompletion(ExecutionCompletedEventArgs e)
         {
-            EventHandler<ListView> handler = ExecutionCompleted;
+            EventHandler<ExecutionCompletedEventArgs> handler = ExecutionCompleted;
             if (handler != null)
             {
-                handler(this, );
+                handler(this, e);
             }
         }
     }

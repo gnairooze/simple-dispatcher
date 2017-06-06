@@ -15,6 +15,8 @@ namespace SimpleDispatcher.Business.Exec.Generic
 
         bool Execute(Business.View.Request.ListView request);
 
-        event EventHandler<View.Request.ListView> ExecutionCompleted;
+        event EventHandler<ExecutionCompletedEventArgs> ExecutionCompleted;
+
+        void OnExecutionCompletion(ExecutionCompletedEventArgs e);
     }
 }

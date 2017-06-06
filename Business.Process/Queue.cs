@@ -27,11 +27,24 @@ namespace SimpleDispatcher.Business.Process
 
             ExecFactory execfactory = new ExecFactory(this.Logger, Queue._db);
             Queue._exec = execfactory.GetExecution(executionType);
+            Queue._exec.ExecutionCompleted += _exec_ExecutionCompleted;
 
             loadOperationsSettings();
             
             this.QueueID = queueID;
             this.TopCount = topCount;
+        }
+
+        private void _exec_ExecutionCompleted(object sender, ExecutionCompletedEventArgs e)
+        {
+            logInfo(string.Format("execution completed event triggered for request with ID {0} and status {1}", e.Request.ID, e.Succeeded ? "succeeded" : "failed"));
+
+            logInfo(string.Format("start updating request with ID {0}", e.Request.ID));
+
+            updateRequestStatus(e.Request, e.Succeeded);
+
+            logInfo(string.Format("end updating request with ID {0}", e.Request.ID));
+
         }
         #endregion
 
@@ -86,8 +99,9 @@ namespace SimpleDispatcher.Business.Process
             int requestCount = this._DataModelRequests.Count();
             logInfo(string.Format("start startProcessing with {0} requests", requestCount));
 
-            Parallel.ForEach(this._DataModelRequests, dataModelRequest => SomeMethod(x));
+            //Parallel.ForEach(this._DataModelRequests, dataModelRequest => SomeMethod(x));
 
+            List<Task<bool>> tasks = new List<Task<bool>>();
 
             foreach (var dataModelRequest in this._DataModelRequests)
             {
@@ -96,18 +110,12 @@ namespace SimpleDispatcher.Business.Process
                 requestCounter++;
                 logInfo(string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
 
-                Task<bool> task = _exec.ExecuteAsync(request);
+                tasks.Add(_exec.ExecuteAsync(request));
 
-                logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
-
-                logInfo(string.Format("start updating {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
-
-                updateRequestStatus(request, succeeded);
-
-                logInfo(string.Format("end updating {0} of {1} requests", requestCounter, requestCount));
+                //logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
             }
 
-            
+            Task.WaitAll(tasks.ToArray());
 
             logInfo("end startProcessing");
         }

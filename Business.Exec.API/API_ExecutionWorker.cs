@@ -7,27 +7,47 @@ using SimpleDispatcher.Business.View.Request;
 using SimpleDispatcher.Business.Exec.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net;
+using System.IO;
 
 namespace SimpleDispatcher.Business.Exec.API
 {
-    public class API_ExecutionWorker : IExecutionWorker
+    public class API_ExecutionWorker : IExecutionWorkerAsync
     {
+        public event EventHandler<ExecutionCompletedEventArgs> ExecutionCompleted;
+
         #region properties
         public View.Worker.ListView ViewModel { get; set; }
         #endregion
 
         public bool Execute(ListView request)
         {
-            Task<HttpResponseMessage> task = post(this.ViewModel.URL, this.ViewModel.Headers, request.Data);
+            Task<HttpResponseMessage> task = postAsync(this.ViewModel.URL, this.ViewModel.Headers, this.ViewModel.Timeout, request.Data);
 
             task.Wait();
 
             HttpResponseMessage response = task.Result;
 
+            bool result = response.StatusCode == System.Net.HttpStatusCode.OK;
+
+            //trigger the event
+            OnExecutionCompletion(new ExecutionCompletedEventArgs() {
+                Request = request,
+                Succeeded = result,
+                Worker = this
+            });
+
+            return result;
+        }
+
+        public Task<bool> ExecuteAsync(ListView request)
+        {
+            Task<bool> task = new Task<bool>()
+
             return response.StatusCode == System.Net.HttpStatusCode.OK;
         }
 
-        private async Task<HttpResponseMessage> post(string url, string headers, string data)
+        private async Task<HttpResponseMessage> postAsync(string url, string headers, int timeoutSeconds, string data)
         {
             HttpResponseMessage response = null;
 
@@ -37,6 +57,7 @@ namespace SimpleDispatcher.Business.Exec.API
                 client.BaseAddress = new Uri(url);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.Timeout = new TimeSpan(0,0, timeoutSeconds);
 
                 foreach (var header in headers.Split(Environment.NewLine.ToCharArray()))
                 {
@@ -49,6 +70,15 @@ namespace SimpleDispatcher.Business.Exec.API
             }
 
             return response;
+        }
+        public void OnExecutionCompletion(ExecutionCompletedEventArgs e)
+        {
+            EventHandler<ExecutionCompletedEventArgs> handler = ExecutionCompleted;
+
+            if(handler != null)
+            {
+                handler(this, e);
+            }
         }
     }
 }

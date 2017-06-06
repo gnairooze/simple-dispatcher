@@ -10,6 +10,8 @@ namespace SimpleDispatcher.Business.Exec.Generic
 {
     public class Execution
     {
+        public event EventHandler<ExecutionCompletedEventArgs> ExecutionCompleted;
+
         #region attributes
         protected List<IExecutionWorker> _ExecutionWorkers = new List<IExecutionWorker>();
         protected List<IExecutionWorkerAsync> _ExecutionWorkersAsync = new List<IExecutionWorkerAsync>();
@@ -54,6 +56,8 @@ namespace SimpleDispatcher.Business.Exec.Generic
                           where workerItem.ViewModel.BusinessID == request.Worker_BusinessID
                           select workerItem).Single();
 
+            worker.ExecutionCompleted += Worker_ExecutionCompleted;
+
             bool succeeded = await worker.ExecuteAsync(request);
 
             //the following log is commented because the execution did not complete, as it is async and the result is not correct without task.wait()
@@ -62,6 +66,25 @@ namespace SimpleDispatcher.Business.Exec.Generic
             return succeeded;
         }
 
+        private void Worker_ExecutionCompleted(object sender, ExecutionCompletedEventArgs e)
+        {
+            //bubble the event up to queue
+            OnExecutionCompletion(new ExecutionCompletedEventArgs()
+            {
+                Request = e.Request,
+                Worker = e.Worker,
+                Succeeded = e.Succeeded
+            });
+        }
+
+        public void OnExecutionCompletion(ExecutionCompletedEventArgs e)
+        {
+            EventHandler<ExecutionCompletedEventArgs> handler = ExecutionCompleted;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
         /// <summary>
         /// Load execution workers. We can have many types doing many businesses.
         /// </summary>

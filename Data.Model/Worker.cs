@@ -20,6 +20,11 @@ namespace SimpleDispatcher.Data.Model
         public string URL { get; set; }
         [MaxLength(2048)]
         public string Headers { get; set; }
+        /// <summary>
+        /// timeout in seconds
+        /// </summary>
+        [Required]
+        public int Timeout { get; set; }
         #endregion
     }
 }

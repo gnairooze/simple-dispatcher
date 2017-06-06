@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Execution.cs" />
+    <Compile Include="ExecutionCompletedEventArgs.cs" />
     <Compile Include="IExecutionWorker.cs" />
     <Compile Include="IExecutionWorkerAsync.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

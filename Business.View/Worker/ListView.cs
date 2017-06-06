@@ -22,6 +22,7 @@ namespace SimpleDispatcher.Business.View.Worker
             this.ID = worker.ID;
             this.ModeifiedOn = worker.ModifiedOn;
             this.Name = worker.Name;
+            this.Timeout = worker.Timeout;
             this.URL = worker.URL;
         }
         #endregion
@@ -32,6 +33,10 @@ namespace SimpleDispatcher.Business.View.Worker
         public string Name { get; set; }
         public string URL { get; set; }
         public string Headers { get; set; }
+        /// <summary>
+        /// timeout in seconds
+        /// </summary>
+        public int Timeout { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModeifiedOn { get; set; }
         #endregion
