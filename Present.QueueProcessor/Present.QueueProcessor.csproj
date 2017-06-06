@@ -69,6 +69,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Business.Exec.API\Business.Exec.API.csproj">
+      <Project>{414dccb3-7010-4835-93bc-dd82dfa09639}</Project>
+      <Name>Business.Exec.API</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Business.Exec.Generic\Business.Exec.Generic.csproj">
+      <Project>{b4575122-06bd-4841-b16e-2ac5fa404864}</Project>
+      <Name>Business.Exec.Generic</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Business.Process\Business.Process.csproj">
       <Project>{735edc9e-11bc-4942-a4b9-91a1e6e4ba5b}</Project>
       <Name>Business.Process</Name>

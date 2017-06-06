@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SimpleDispatcher.Business.View.Request;
+using SimpleDispatcher.Business.Exec.Generic;
 
 namespace SimpleDispatcher.Business.Process
 {
@@ -12,20 +13,21 @@ namespace SimpleDispatcher.Business.Process
     {
         #region attributes
         protected List<Business.View.OperationSettings.ListView> _OperationsSettings;
-        protected List<Business.View.Worker.ListView> _Workers;
+
         protected List<Data.Model.Request> _DataModelRequests;
 
-        static Data.Model.QueueDbContext db = new Data.Model.QueueDbContext();
-        static Execution exec = null;
+        static Data.Model.QueueDbContext _db = new Data.Model.QueueDbContext();
+        static Execution _exec = null;
         #endregion
 
         #region constructors
-        public Queue(int queueID, int topCount, ILogger.ILog logger)
+        public Queue(int queueID, int topCount, ILogger.ILog logger, Vault.ExecType executionType )
         {
             this.Logger = logger;
-            Queue.exec = new Execution(this.Logger);
 
-            loadWorkers();
+            ExecFactory execfactory = new ExecFactory(this.Logger, Queue._db);
+            Queue._exec = execfactory.GetExecution(executionType);
+
             loadOperationsSettings();
             
             this.QueueID = queueID;
@@ -45,6 +47,12 @@ namespace SimpleDispatcher.Business.Process
             startProcessing();
         }
 
+        public void RunAsync()
+        {
+            loadRequests();
+            startProcessingAsync();
+        }
+
         private void startProcessing()
         {
             int requestCounter = 0;
@@ -58,7 +66,7 @@ namespace SimpleDispatcher.Business.Process
                 requestCounter++;
                 logInfo(string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
 
-                bool succeeded = exec.Execute(request);
+                bool succeeded = _exec.Execute(request);
 
                 logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
 
@@ -72,6 +80,37 @@ namespace SimpleDispatcher.Business.Process
             logInfo("end startProcessing");
         }
 
+        private void startProcessingAsync()
+        {
+            int requestCounter = 0;
+            int requestCount = this._DataModelRequests.Count();
+            logInfo(string.Format("start startProcessing with {0} requests", requestCount));
+
+            Parallel.ForEach(this._DataModelRequests, dataModelRequest => SomeMethod(x));
+
+
+            foreach (var dataModelRequest in this._DataModelRequests)
+            {
+                Business.View.Request.ListView request = new Business.View.Request.ListView(dataModelRequest);
+
+                requestCounter++;
+                logInfo(string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
+
+                Task<bool> task = _exec.ExecuteAsync(request);
+
+                logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
+
+                logInfo(string.Format("start updating {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
+
+                updateRequestStatus(request, succeeded);
+
+                logInfo(string.Format("end updating {0} of {1} requests", requestCounter, requestCount));
+            }
+
+            
+
+            logInfo("end startProcessing");
+        }
         private bool updateRequestStatus(ListView request, bool succeeded)
         {
             logInfo(string.Format("start updateRequestStatus of request with ID {0} to be {1}", request.ID, succeeded?"succeeded":"failed"));
@@ -101,7 +140,7 @@ namespace SimpleDispatcher.Business.Process
                 }
             }
 
-            Data.Model.Request dataModel = Queue.db.Request.Single(r => r.ID == request.ID);
+            Data.Model.Request dataModel = Queue._db.Request.Single(r => r.ID == request.ID);
 
             if(dataModel.ModifiedOn != request.ModifiedOn)
             {
@@ -117,7 +156,7 @@ namespace SimpleDispatcher.Business.Process
 
             dataModel.ModifiedOn = DateTime.Now;
 
-            Queue.db.SaveChanges();
+            Queue._db.SaveChanges();
 
             logInfo(string.Format("request with ID {0} updated in DB", request.ID));
 
@@ -132,7 +171,7 @@ namespace SimpleDispatcher.Business.Process
             logInfo("start loadRequests");
 
             DateTime runDate = DateTime.Now;
-            this._DataModelRequests = (from dataModel in Queue.db.Request
+            this._DataModelRequests = (from dataModel in Queue._db.Request
                         where dataModel.QueueID == this.QueueID
                         && 
                         (
@@ -152,29 +191,11 @@ namespace SimpleDispatcher.Business.Process
             logInfo("end loadRequests");
         }
 
-        private void loadWorkers()
-        {
-            logInfo("start loadWorkers");
-
-            var query = from dataModel in Queue.db.Worker
-                        select dataModel;
-
-            _Workers = new List<View.Worker.ListView>();
-
-            foreach (var dataModel in query)
-            {
-                _Workers.Add(new View.Worker.ListView(dataModel));
-            }
-
-            logInfo("workers read from DB to _Workers");
-
-            logInfo("end loadWorkers");
-        }
         private void loadOperationsSettings()
         {
             logInfo("start loadOperationsSettings");
 
-            var query = from dataModel in Queue.db.OperationSettings
+            var query = from dataModel in Queue._db.OperationSettings
                         select dataModel;
 
             _OperationsSettings = new List<View.OperationSettings.ListView>();

@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Present.QueueProcessor", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.QueueProcessor", "Test.QueueProcessor\Test.QueueProcessor.csproj", "{D3A150C5-2359-4CAF-AF55-560F5B660547}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.Exec.Generic", "Business.Exec.Generic\Business.Exec.Generic.csproj", "{B4575122-06BD-4841-B16E-2AC5FA404864}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.Exec.API", "Business.Exec.API\Business.Exec.API.csproj", "{414DCCB3-7010-4835-93BC-DD82DFA09639}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{D3A150C5-2359-4CAF-AF55-560F5B660547}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3A150C5-2359-4CAF-AF55-560F5B660547}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3A150C5-2359-4CAF-AF55-560F5B660547}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4575122-06BD-4841-B16E-2AC5FA404864}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4575122-06BD-4841-B16E-2AC5FA404864}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4575122-06BD-4841-B16E-2AC5FA404864}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4575122-06BD-4841-B16E-2AC5FA404864}.Release|Any CPU.Build.0 = Release|Any CPU
+		{414DCCB3-7010-4835-93BC-DD82DFA09639}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{414DCCB3-7010-4835-93BC-DD82DFA09639}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{414DCCB3-7010-4835-93BC-DD82DFA09639}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{414DCCB3-7010-4835-93BC-DD82DFA09639}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
