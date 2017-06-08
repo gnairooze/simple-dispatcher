@@ -38,5 +38,27 @@ namespace SimpleDispatcher.Business.Exec.API
             logInfo("end loadExecutionWorkers");
         }
 
+        protected override void loadExecutionWorkersAsync()
+        {
+            logInfo("start loadExecutionWorkersAsync");
+
+            var query = from dataModel in this.DB.Worker
+                        select dataModel;
+
+            _ExecutionWorkers = new List<IExecutionWorker>();
+
+            foreach (var dataModel in query)
+            {
+                _ExecutionWorkersAsync.Add(new API_ExecutionWorker()
+                {
+                    ViewModel = new View.Worker.ListView(dataModel)
+                });
+            }
+
+            logInfo("workers read from DB to _ExecutionWorkers");
+
+            logInfo("end loadExecutionWorkersAsync");
+        }
+
     }
 }

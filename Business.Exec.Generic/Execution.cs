@@ -60,8 +60,7 @@ namespace SimpleDispatcher.Business.Exec.Generic
 
             bool succeeded = await worker.ExecuteAsync(request);
 
-            //the following log is commented because the execution did not complete, as it is async and the result is not correct without task.wait()
-            //logInfo(string.Format("end ExecuteAsync of request with ID {0} with status {1}", request.ID, task.Result ? "succeeded" : "failed"));
+            logInfo(string.Format("end ExecuteAsync of request with ID {0} with status {1}", request.ID, succeeded ? "succeeded" : "failed"));
 
             return succeeded;
         }
@@ -101,7 +100,7 @@ namespace SimpleDispatcher.Business.Exec.Generic
         {
             logInfo("start loadExecutionWorkers");
 
-            this._ExecutionWorkers.Add(new TestExecutionWorker());
+            this._ExecutionWorkersAsync.Add(new TestExecutionWorkerAsync());
 
             logInfo("end loadExecutionWorkers");
         }

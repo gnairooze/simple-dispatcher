@@ -40,11 +40,21 @@ namespace SimpleDispatcher.Business.Exec.API
             return result;
         }
 
-        public Task<bool> ExecuteAsync(ListView request)
+        public async Task<bool> ExecuteAsync(ListView request)
         {
-            Task<bool> task = new Task<bool>()
+            HttpResponseMessage response = await postAsync(this.ViewModel.URL, this.ViewModel.Headers, this.ViewModel.Timeout, request.Data);
 
-            return response.StatusCode == System.Net.HttpStatusCode.OK;
+            bool result = response.StatusCode == System.Net.HttpStatusCode.OK;
+            
+            //trigger the event
+            OnExecutionCompletion(new ExecutionCompletedEventArgs()
+            {
+                Request = request,
+                Succeeded = result,
+                Worker = this
+            });
+
+            return result;
         }
 
         private async Task<HttpResponseMessage> postAsync(string url, string headers, int timeoutSeconds, string data)
