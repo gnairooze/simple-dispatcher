@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SimpleDispatcher.Business.View.Request;
 using SimpleDispatcher.Business.Exec.Generic;
+using System.Collections;
 
 namespace SimpleDispatcher.Business.Process
 {
@@ -41,7 +42,7 @@ namespace SimpleDispatcher.Business.Process
 
             logInfo(string.Format("start updating request with ID {0}", e.Request.ID));
 
-            updateRequestStatus(e.Request, e.Succeeded);
+            bool result = updateRequestStatus(e.Request, e.Succeeded);
 
             logInfo(string.Format("end updating request with ID {0}", e.Request.ID));
 
@@ -113,10 +114,59 @@ namespace SimpleDispatcher.Business.Process
                 logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
             }
 
-            Task.WaitAll(tasks.ToArray());
+            StringBuilder errorLogBuilder = new StringBuilder();
+
+            try
+            {
+                Task.WaitAll(tasks.ToArray());
+            }
+            catch(AggregateException ae)
+            {
+                logError(ae.GetBaseException(), ref errorLogBuilder);
+                logError(ae, ref errorLogBuilder);
+
+                ae.Handle((x) =>
+                {
+                    logError(x, ref errorLogBuilder);
+
+                    return true;
+                });
+
+            }
+            catch (Exception ex)
+            {
+                logError(ex, ref errorLogBuilder);
+            }
 
             logInfo("end startProcessing");
         }
+
+        private string extractError(Exception ex, ref StringBuilder bld)
+        {
+            if(bld == null)
+            {
+                bld = new StringBuilder();
+            }
+
+            if(ex.Data != null && ex.Data.Count > 0)
+            {
+                foreach (DictionaryEntry item in ex.Data)
+                {
+                    bld.AppendLine(String.Format("Data Key:{0}. Data Value:{1}.",item.Key, item.Value));
+                }
+            }
+
+            bld.AppendLine(String.Format("Message:{0}.", ex.Message));
+            bld.AppendLine(String.Format("StackTrace:{0}.", ex.StackTrace));
+
+            if(ex.InnerException != null)
+            {
+                extractError(ex.InnerException, ref bld);
+            }
+
+            return bld.ToString();
+        }
+
         private bool updateRequestStatus(ListView request, bool succeeded)
         {
             logInfo(string.Format("start updateRequestStatus of request with ID {0} to be {1}", request.ID, succeeded?"succeeded":"failed"));
@@ -220,6 +270,12 @@ namespace SimpleDispatcher.Business.Process
         private void logInfo(string what)
         {
             this.Logger.Log(ILogger.Priority.Info, this.GetType().ToString(), what, DateTime.Now);
+        }
+
+        private void logError(Exception ex, ref StringBuilder bld)
+        {
+            string errorDetails = extractError(ex, ref bld);
+            this.Logger.Log(ILogger.Priority.Error, this.GetType().ToString(), errorDetails, DateTime.Now);
         }
     }
 }
