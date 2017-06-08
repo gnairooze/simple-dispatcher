@@ -14,7 +14,12 @@ namespace SimpleDispatcher.Test.QueueProcessor
         {
             deleteOperationsSettings();
 
-            fillOperationsSettings();
+            Guid worker_BusinessID = Guid.Parse("A92DF39B-EEC6-4967-989C-9C3177BE1231");
+            long worker_ID = 1;
+
+            fillWorkers(worker_BusinessID, worker_ID);
+
+            fillOperationsSettings(worker_BusinessID, worker_ID);
             fillRequests();
         }
 
@@ -61,7 +66,7 @@ namespace SimpleDispatcher.Test.QueueProcessor
             TestData._DB.SaveChanges();
         }
 
-        private static void fillOperationsSettings()
+        private static void fillOperationsSettings(Guid worker_BusinessID, long worker_ID)
         {
             for (int i = 0; i < 4; i++)
             {
@@ -79,7 +84,9 @@ namespace SimpleDispatcher.Test.QueueProcessor
                     MaxRetrialCount = 2,
                     ModifiedOn = DateTime.Now,
                     Operation = "Operation " + Convert.ToChar(65+i),
-                    RetrialDelay = 10
+                    RetrialDelay = 10,
+                    Worker_BusinessID = worker_BusinessID,
+                    Worker_ID = worker_ID
                 });
             }
 
@@ -92,6 +99,20 @@ namespace SimpleDispatcher.Test.QueueProcessor
             TestData._DB.OperationSettings.RemoveRange(TestData._DB.OperationSettings);
 
             TestData._DB.SaveChanges();
+        }
+
+        private static void fillWorkers(Guid worker_BusinessID, long worker_ID)
+        {
+            TestData._DB.Worker.Add(new Data.Model.Worker() {
+                BusinessID = worker_BusinessID,
+                CreatedOn = DateTime.Now,
+                Headers = new StringBuilder().AppendLine("content-type:application/json").ToString(),
+                ID = worker_ID,
+                ModifiedOn = DateTime.Now,
+                Name = "TestAPI",
+                Timeout = 10,
+                URL = "http://localhost:8090/TestAPI/api/values"
+            });
         }
     }
 }

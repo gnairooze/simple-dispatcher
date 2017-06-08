@@ -16,6 +16,7 @@ namespace SimpleDispatcher.Present.QueueProcessor
                 Business.Process.Vault.ExecType.ApiWorker);
 
             queue.Run();
+            queue.RunAsync();
 
             Console.WriteLine("Press any key to exit ...");
             Console.Read();

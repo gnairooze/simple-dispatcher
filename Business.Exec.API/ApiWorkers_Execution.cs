@@ -27,10 +27,13 @@ namespace SimpleDispatcher.Business.Exec.API
 
             foreach (var dataModel in query)
             {
-                _ExecutionWorkers.Add(new API_ExecutionWorker()
+                var worker = new API_ExecutionWorker()
                 {
                     ViewModel = new View.Worker.ListView(dataModel)
-                });
+                };
+                worker.ExecutionCompleted += Worker_ExecutionCompleted;
+
+                _ExecutionWorkers.Add(worker);
             }
 
             logInfo("workers read from DB to _ExecutionWorkers");
@@ -45,14 +48,17 @@ namespace SimpleDispatcher.Business.Exec.API
             var query = from dataModel in this.DB.Worker
                         select dataModel;
 
-            _ExecutionWorkers = new List<IExecutionWorker>();
+            _ExecutionWorkersAsync = new List<IExecutionWorkerAsync>();
 
             foreach (var dataModel in query)
             {
-                _ExecutionWorkersAsync.Add(new API_ExecutionWorker()
+                var worker = new API_ExecutionWorker()
                 {
                     ViewModel = new View.Worker.ListView(dataModel)
-                });
+                };
+                worker.ExecutionCompleted += Worker_ExecutionCompleted;
+
+                _ExecutionWorkersAsync.Add(worker);
             }
 
             logInfo("workers read from DB to _ExecutionWorkers");

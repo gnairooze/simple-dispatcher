@@ -60,23 +60,41 @@ namespace SimpleDispatcher.Business.Exec.API
         private async Task<HttpResponseMessage> postAsync(string url, string headers, int timeoutSeconds, string data)
         {
             HttpResponseMessage response = null;
+            string contentType = "application/json";
+
+            HttpContent postData = new StringContent(data, Encoding.UTF8);
 
             using (var client = new HttpClient())
             {
                 #region create http client object
                 client.BaseAddress = new Uri(url);
+                client.Timeout = new TimeSpan(0, 0, timeoutSeconds);
                 client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.Timeout = new TimeSpan(0,0, timeoutSeconds);
 
                 foreach (var header in headers.Split(Environment.NewLine.ToCharArray()))
                 {
+                    if (String.IsNullOrWhiteSpace(header))
+                    {
+                        continue;
+                    }
+
                     string[] splittedHeader = header.Split(":".ToCharArray());
-                    client.DefaultRequestHeaders.Add(splittedHeader[0], splittedHeader[1]);
+
+                    if(splittedHeader[0].ToLower() == "content-type")
+                    {
+                        contentType = splittedHeader[1];
+                    }
+                    else
+                    {
+                        client.DefaultRequestHeaders.Add(splittedHeader[0], splittedHeader[1]);
+                    }
                 }
+
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(contentType));
+                postData.Headers.ContentType = new MediaTypeHeaderValue(contentType);
                 #endregion
 
-                response = await client.PostAsync(url, new StringContent(data));
+                response = await client.PostAsync(url, postData);
             }
 
             return response;

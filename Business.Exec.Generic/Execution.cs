@@ -65,7 +65,7 @@ namespace SimpleDispatcher.Business.Exec.Generic
             return succeeded;
         }
 
-        private void Worker_ExecutionCompleted(object sender, ExecutionCompletedEventArgs e)
+        protected void Worker_ExecutionCompleted(object sender, ExecutionCompletedEventArgs e)
         {
             //bubble the event up to queue
             OnExecutionCompletion(new ExecutionCompletedEventArgs()
@@ -91,7 +91,10 @@ namespace SimpleDispatcher.Business.Exec.Generic
         {
             logInfo("start loadExecutionWorkers");
 
-            this._ExecutionWorkers.Add(new TestExecutionWorker());
+            var worker = new TestExecutionWorker();
+            worker.ExecutionCompleted += Worker_ExecutionCompleted;
+
+            this._ExecutionWorkers.Add(worker);
 
             logInfo("end loadExecutionWorkers");
         }
@@ -100,7 +103,10 @@ namespace SimpleDispatcher.Business.Exec.Generic
         {
             logInfo("start loadExecutionWorkers");
 
-            this._ExecutionWorkersAsync.Add(new TestExecutionWorkerAsync());
+            var worker = new TestExecutionWorkerAsync();
+            worker.ExecutionCompleted += Worker_ExecutionCompleted;
+
+            this._ExecutionWorkersAsync.Add(worker);
 
             logInfo("end loadExecutionWorkers");
         }
