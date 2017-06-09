@@ -27,6 +27,7 @@ namespace SimpleDispatcher.Business.View.Request
             this.ModifiedOn = request.ModifiedOn;
             this.NextRetryOn = request.NextRetryOn;
             this.Operation = request.Operation;
+            this.OperationSettings_ID = request.OperationSettings_ID;
             this.QueueID = request.QueueID;
             this.ReferenceName = request.ReferenceName;
             this.ReferenceValue = request.ReferenceValue;

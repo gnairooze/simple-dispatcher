@@ -83,10 +83,6 @@ namespace SimpleDispatcher.Business.Process
                 bool succeeded = _exec.Execute(request);
 
                 logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
-
-                logInfo(string.Format("start updating {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
-
-                logInfo(string.Format("end updating {0} of {1} requests", requestCounter, requestCount));
             }
 
             logInfo("end startProcessing");
