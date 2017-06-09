@@ -59,7 +59,8 @@ namespace SimpleDispatcher.Test.QueueProcessor
                     RemainingRetrials = 2,
                     Status = 1,
                     Worker_BusinessID = workerGuid,
-                    Worker_ID = 1
+                    Worker_ID = 1,
+                    OperationSettings_ID = i % 4
                 });
             }
 

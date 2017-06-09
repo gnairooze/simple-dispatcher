@@ -177,19 +177,19 @@ namespace SimpleDispatcher.Business.Process
 
             if (succeeded)
             {
-                request.Status = View.BusinessVault.RequestStatus.Succeeded;
+                request.Status = View.Vault.RequestStatus.Succeeded;
             }
             else
             {
                 if(request.RemainingRetrials <= 0)
                 {
-                    request.Status = View.BusinessVault.RequestStatus.Failed;
+                    request.Status = View.Vault.RequestStatus.Failed;
                     request.NextRetryOn = null;
                     logInfo(string.Format("request with ID {0} consumed all retrial count. It is marked as failed", request.ID));
                 }
                 else
                 {
-                    request.Status = View.BusinessVault.RequestStatus.Retrying;
+                    request.Status = View.Vault.RequestStatus.Retrying;
                     request.NextRetryOn = DateTime.Now.AddSeconds(operationSettings.RetrialDelay);
 
                     logInfo(string.Format("request with ID {0} is marked for retrial. Remaining retirals is {1}. Next retry on {2}", request.ID, request.RemainingRetrials, request.NextRetryOn));
@@ -231,10 +231,10 @@ namespace SimpleDispatcher.Business.Process
                         where dataModel.QueueID == this.QueueID
                         && 
                         (
-                            dataModel.Status == (byte)Business.View.BusinessVault.RequestStatus.NotProcessed 
+                            dataModel.Status == (byte)Business.View.Vault.RequestStatus.NotProcessed 
                             || 
                             (
-                                dataModel.Status == (byte)Business.View.BusinessVault.RequestStatus.Retrying
+                                dataModel.Status == (byte)Business.View.Vault.RequestStatus.Retrying
                                 &&
                                 dataModel.NextRetryOn <= runDate
                             )

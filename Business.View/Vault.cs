@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimpleDispatcher.Business.View
 {
-    public class BusinessVault
+    public class Vault
     {
         public enum RequestStatus
         {

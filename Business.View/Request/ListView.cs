@@ -40,6 +40,7 @@ namespace SimpleDispatcher.Business.View.Request
         #region properties
         public long ID { get; set; }
         public Guid BusinessID { get; set; }
+        public long OperationSettings_ID { get; set; }
         public string Operation { get; set; }
         public string ReferenceName { get; set; }
         public string ReferenceValue { get; set; }
@@ -48,11 +49,11 @@ namespace SimpleDispatcher.Business.View.Request
         public Guid Worker_BusinessID { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime ModifiedOn { get; set; }
-        public BusinessVault.RequestStatus Status
+        public Vault.RequestStatus Status
         {
             get
             {
-                return (BusinessVault.RequestStatus)this._Status;
+                return (Vault.RequestStatus)this._Status;
             }
             set
             {
@@ -76,6 +77,7 @@ namespace SimpleDispatcher.Business.View.Request
             request.Data = this.Data;
             request.NextRetryOn = this.NextRetryOn;
             request.Operation = this.Operation;
+            request.OperationSettings_ID = this.OperationSettings_ID;
             request.QueueID = this.QueueID;
             request.ReferenceName = this.ReferenceName;
             request.ReferenceValue = this.ReferenceValue;

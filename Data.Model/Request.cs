@@ -12,6 +12,9 @@ namespace SimpleDispatcher.Data.Model
     {
         #region properties
         [Required]
+        [Index]
+        public long OperationSettings_ID { get; set; }
+        [Required]
         [MaxLength(20)]
         [Index]
         public string Operation { get; set; }
