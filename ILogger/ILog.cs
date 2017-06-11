@@ -8,6 +8,10 @@ namespace ILogger
 {
     public interface ILog
     {
+        bool CanAddError { get; set; }
+        bool CanAddWarning { get; set; }
+        bool CanAddInfo { get; set; }
+
         void Log(Priority logPriority,string who, string what, DateTime when);
     }
 
