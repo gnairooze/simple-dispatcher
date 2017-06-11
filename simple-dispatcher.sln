@@ -27,6 +27,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Present.Maintenance", "Pres
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.Maintenance", "Business.Maintenance\Business.Maintenance.csproj", "{02FD24BB-8E42-426C-8244-0EF2414FDB4D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Present.API", "Present.API\Present.API.csproj", "{D088861D-2CB9-44B7-A769-C0D403BE194E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.Request", "Business.Request\Business.Request.csproj", "{83577118-D8B4-4053-9D7F-658C72BCBE86}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External DLLs", "External DLLs", "{38983137-882D-4979-9EAB-A6D1B4BCEFAC}"
+	ProjectSection(SolutionItems) = preProject
+		External DLLs\Mora.Common.Method.Parameter.dll = External DLLs\Mora.Common.Method.Parameter.dll
+		External DLLs\Mora.Common.Method.Parameter.pdb = External DLLs\Mora.Common.Method.Parameter.pdb
+		External DLLs\Mora.Common.Vault.dll = External DLLs\Mora.Common.Vault.dll
+		External DLLs\Mora.Common.Vault.pdb = External DLLs\Mora.Common.Vault.pdb
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.OperationSettings", "Business.OperationSettings\Business.OperationSettings.csproj", "{AD6916AE-D082-402E-A151-127748D3A61F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +95,18 @@ Global
 		{02FD24BB-8E42-426C-8244-0EF2414FDB4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02FD24BB-8E42-426C-8244-0EF2414FDB4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02FD24BB-8E42-426C-8244-0EF2414FDB4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D088861D-2CB9-44B7-A769-C0D403BE194E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D088861D-2CB9-44B7-A769-C0D403BE194E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D088861D-2CB9-44B7-A769-C0D403BE194E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D088861D-2CB9-44B7-A769-C0D403BE194E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83577118-D8B4-4053-9D7F-658C72BCBE86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83577118-D8B4-4053-9D7F-658C72BCBE86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83577118-D8B4-4053-9D7F-658C72BCBE86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83577118-D8B4-4053-9D7F-658C72BCBE86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD6916AE-D082-402E-A151-127748D3A61F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD6916AE-D082-402E-A151-127748D3A61F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD6916AE-D082-402E-A151-127748D3A61F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD6916AE-D082-402E-A151-127748D3A61F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
