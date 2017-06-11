@@ -8,7 +8,11 @@ namespace SimpleDispatcher.Present.Maintenance
 {
     class Program
     {
-        static ConsoleLogger.SimpleLogger _Logger = new ConsoleLogger.SimpleLogger();
+        static ConsoleLogger.SimpleLogger _Logger = new ConsoleLogger.SimpleLogger() {
+            CanAddError = Present.Maintenance.Properties.Settings.Default.CanAddError,
+            CanAddInfo = Present.Maintenance.Properties.Settings.Default.CanAddInfo,
+            CanAddWarning = Present.Maintenance.Properties.Settings.Default.CanAddWarning
+        };
 
         static void Main(string[] args)
         {

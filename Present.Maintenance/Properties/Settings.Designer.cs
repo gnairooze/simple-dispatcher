@@ -94,5 +94,32 @@ namespace SimpleDispatcher.Present.Maintenance.Properties {
                 return ((int)(this["DeleteTimeout"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CanAddError {
+            get {
+                return ((bool)(this["CanAddError"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CanAddWarning {
+            get {
+                return ((bool)(this["CanAddWarning"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CanAddInfo {
+            get {
+                return ((bool)(this["CanAddInfo"]));
+            }
+        }
     }
 }

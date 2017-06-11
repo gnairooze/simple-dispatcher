@@ -26,5 +26,14 @@
     <Setting Name="DeleteTimeout" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">3600</Value>
     </Setting>
+    <Setting Name="CanAddError" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CanAddWarning" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CanAddInfo" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
