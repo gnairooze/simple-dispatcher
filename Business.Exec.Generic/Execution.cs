@@ -15,54 +15,22 @@ namespace SimpleDispatcher.Business.Exec.Generic
         #region attributes
         protected List<IExecutionWorker> _ExecutionWorkers = new List<IExecutionWorker>();
         protected List<IExecutionWorkerAsync> _ExecutionWorkersAsync = new List<IExecutionWorkerAsync>();
+
+        protected int _Counter;
+        protected Guid _Group;
         #endregion
 
         #region constructors
         public Execution(ILog logger, Data.Model.QueueDbContext db)
         {
+            this._Counter = 1;
+            this._Group = Guid.NewGuid();
+
             this.Logger = logger;
             this.DB = db;
 
             loadExecutionWorkers();
             loadExecutionWorkersAsync();
-        }
-        #endregion
-
-        #region properties
-        public ILogger.ILog Logger { protected get; set; }
-        public Data.Model.QueueDbContext DB { protected get; set; }
-        #endregion
-
-        public bool Execute(Business.View.Request.ListView request)
-        {
-            logInfo(string.Format("start Execute of request with ID {0}", request.ID));
-
-            var worker = (from workerItem in this._ExecutionWorkers
-                          where workerItem.ViewModel.BusinessID == request.Worker_BusinessID
-                          select workerItem).Single();
-
-            bool succeeded = worker.Execute(request);
-
-            logInfo(string.Format("end Execute of request with ID {0} with status {1}", request.ID, succeeded?"succeeded":"failed"));
-
-            return succeeded;
-        }
-
-        public async Task<bool> ExecuteAsync(Business.View.Request.ListView request)
-        {
-            logInfo(string.Format("start ExecuteAsync of request with ID {0}", request.ID));
-
-            var worker = (from workerItem in this._ExecutionWorkersAsync
-                          where workerItem.ViewModel.BusinessID == request.Worker_BusinessID
-                          select workerItem).Single();
-
-            worker.ExecutionCompleted += Worker_ExecutionCompleted;
-
-            bool succeeded = await worker.ExecuteAsync(request);
-
-            logInfo(string.Format("end ExecuteAsync of request with ID {0} with status {1}", request.ID, succeeded ? "succeeded" : "failed"));
-
-            return succeeded;
         }
 
         protected void Worker_ExecutionCompleted(object sender, ExecutionCompletedEventArgs e)
@@ -84,36 +52,124 @@ namespace SimpleDispatcher.Business.Exec.Generic
                 handler(this, e);
             }
         }
+        #endregion
+
+        #region properties
+        public ILogger.ILog Logger { protected get; set; }
+        public Data.Model.QueueDbContext DB { protected get; set; }
+        #endregion
+
+        #region entry methods
+        public bool Execute(string clientIP, Business.View.Request.ListView request)
+        {
+            this._Counter = 1;
+            this._Group = Guid.NewGuid();
+
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, clientIP);
+
+            logInfo(who, string.Format("start Execute of request with ID {0}", request.ID), "Request.ID", request.ID.ToString(), this._Counter++, this._Group);
+
+            var worker = (from workerItem in this._ExecutionWorkers
+                          where workerItem.ViewModel.BusinessID == request.Worker_BusinessID
+                          select workerItem).Single();
+
+            bool succeeded = worker.Execute(request);
+
+            logInfo(who, string.Format("end Execute of request with ID {0} with status {1}", request.ID, succeeded ? "succeeded" : "failed"), "Request.ID", request.ID.ToString(), this._Counter++, this._Group);
+
+            return succeeded;
+        }
+
+        public async Task<bool> ExecuteAsync(string clientIP, Business.View.Request.ListView request)
+        {
+            this._Counter = 1;
+            this._Group = Guid.NewGuid();
+
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, clientIP);
+
+            logInfo(who, string.Format("start Execute of request with ID {0}", request.ID), "Request.ID", request.ID.ToString(), this._Counter++, this._Group);
+
+            var worker = (from workerItem in this._ExecutionWorkersAsync
+                          where workerItem.ViewModel.BusinessID == request.Worker_BusinessID
+                          select workerItem).Single();
+
+            worker.ExecutionCompleted += Worker_ExecutionCompleted;
+
+            bool succeeded = await worker.ExecuteAsync(request);
+
+            logInfo(who, string.Format("end Execute of request with ID {0} with status {1}", request.ID, succeeded ? "succeeded" : "failed"), "Request.ID", request.ID.ToString(), this._Counter++, this._Group);
+
+            return succeeded;
+        }
+        #endregion
+
+        #region internal methods
         /// <summary>
         /// Load execution workers. We can have many types doing many businesses.
         /// </summary>
         protected virtual void loadExecutionWorkers()
         {
-            logInfo("start loadExecutionWorkers");
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, string.Empty);
+
+            logInfo(who, "start loadExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
 
             var worker = new TestExecutionWorker();
             worker.ExecutionCompleted += Worker_ExecutionCompleted;
 
             this._ExecutionWorkers.Add(worker);
 
-            logInfo("end loadExecutionWorkers");
+            logInfo(who, "end loadExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
         }
 
         protected virtual void loadExecutionWorkersAsync()
         {
-            logInfo("start loadExecutionWorkers");
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, string.Empty);
+
+            logInfo(who, "start loadExecutionWorkersAsync", string.Empty, string.Empty, this._Counter++, this._Group);
 
             var worker = new TestExecutionWorkerAsync();
             worker.ExecutionCompleted += Worker_ExecutionCompleted;
 
             this._ExecutionWorkersAsync.Add(worker);
 
-            logInfo("end loadExecutionWorkers");
+            logInfo(who, "end loadExecutionWorkersAsync", string.Empty, string.Empty, this._Counter++, this._Group);
         }
 
-        protected void logInfo(string what)
+        protected Guid logInfo(string who, string what, string refName, string refValue, int counter, Guid group)
         {
-            this.Logger.Log(ILogger.Priority.Info, this.GetType().ToString(), what, DateTime.Now);
+            ILogger.LogModel model = new ILogger.LogModel()
+            {
+                Counter = counter,
+                Group = group,
+                LogType = ILogger.TypeOfLog.Info,
+                ReferenceName = refName,
+                ReferenceValue = refValue,
+                What = what,
+                When = DateTime.Now,
+                Who = who
+            };
+
+            return this.Logger.Log(model);
         }
+        protected string getWho(string method, string clientIp)
+        {
+            string name = System.Net.Dns.GetHostName();
+            System.Net.IPAddress[] ips = System.Net.Dns.GetHostAddresses(name);
+
+            List<string> allIPs = new List<string>();
+
+            if (ips != null)
+            {
+                foreach (System.Net.IPAddress ip in ips)
+                {
+                    allIPs.Add(ip.ToString());
+                }
+            }
+
+            string who = string.Format("Client IP:{0} | HostName:{1} | IPs:{2} | Location:{3} | Assembly:{4} | Class:{5} | Method:{6}", clientIp, name, string.Join(",", allIPs.ToArray()), System.Reflection.Assembly.GetExecutingAssembly().Location, System.Reflection.Assembly.GetExecutingAssembly().FullName, this.GetType().ToString(), method);
+
+            return who;
+        }
+        #endregion
     }
 }

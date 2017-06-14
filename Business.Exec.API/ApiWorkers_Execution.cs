@@ -18,7 +18,9 @@ namespace SimpleDispatcher.Business.Exec.API
 
         protected override void loadExecutionWorkers()
         {
-            logInfo("start loadExecutionWorkers");
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, string.Empty);
+
+            logInfo(who, "start loadExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
 
             var query = from dataModel in this.DB.Worker
                         select dataModel;
@@ -36,14 +38,16 @@ namespace SimpleDispatcher.Business.Exec.API
                 _ExecutionWorkers.Add(worker);
             }
 
-            logInfo("workers read from DB to _ExecutionWorkers");
+            logInfo(who, "workers read from DB to _ExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
 
-            logInfo("end loadExecutionWorkers");
+            logInfo(who, "end loadExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
         }
 
         protected override void loadExecutionWorkersAsync()
         {
-            logInfo("start loadExecutionWorkersAsync");
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, string.Empty);
+
+            logInfo(who, "start loadExecutionWorkersAsync", string.Empty, string.Empty, this._Counter++, this._Group);
 
             var query = from dataModel in this.DB.Worker
                         select dataModel;
@@ -61,9 +65,9 @@ namespace SimpleDispatcher.Business.Exec.API
                 _ExecutionWorkersAsync.Add(worker);
             }
 
-            logInfo("workers read from DB to _ExecutionWorkers");
+            logInfo(who, "workers read from DB to _ExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
 
-            logInfo("end loadExecutionWorkersAsync");
+            logInfo(who, "end loadExecutionWorkersAsync", string.Empty, string.Empty, this._Counter++, this._Group);
         }
 
     }
