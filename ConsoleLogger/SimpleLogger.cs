@@ -14,30 +14,36 @@ namespace ConsoleLogger
         public bool CanAddWarning { get; set; }
         public bool CanAddInfo { get; set; }
 
-        public void Log(ILogger.Priority logPriority, string who, string what, DateTime when)
+        public Guid Log(ILogger.LogModel model)
         {
-            switch (logPriority)
+            Guid result = Guid.Empty;
+
+            switch (model.LogType)
             {
-                case ILogger.Priority.Error:
+                case ILogger.TypeOfLog.Error:
                     if (CanAddError)
                     {
-                        Console.WriteLine("{0} - {1} | [{2} - {3}] : {4}", this.Counter++, logPriority, who, when.ToShortTimeString(), what);
+                        Console.WriteLine("{0} - {1} | [{2} - {3}] : {4}", this.Counter++, model.LogType, model.Who, model.When.ToShortTimeString(), model.What);
+                        result = Guid.NewGuid();
                     }
                     break;
-                case ILogger.Priority.Warning:
+                case ILogger.TypeOfLog.Warning:
                     if (CanAddWarning)
                     {
-                        Console.WriteLine("{0} - {1} | [{2} - {3}] : {4}", this.Counter++, logPriority, who, when.ToShortTimeString(), what);
+                        Console.WriteLine("{0} - {1} | [{2} - {3}] : {4}", this.Counter++, model.LogType, model.Who, model.When.ToShortTimeString(), model.What);
+                        result = Guid.NewGuid();
                     }
                     break;
-                case ILogger.Priority.Info:
+                case ILogger.TypeOfLog.Info:
                     if (CanAddInfo)
                     {
-                        Console.WriteLine("{0} - {1} | [{2} - {3}] : {4}", this.Counter++, logPriority, who, when.ToShortTimeString(), what);
+                        Console.WriteLine("{0} - {1} | [{2} - {3}] : {4}", this.Counter++, model.LogType, model.Who, model.When.ToShortTimeString(), model.What);
+                        result = Guid.NewGuid();
                     }
                     break;
             }
-            
+
+            return result;
         }
     }
 }

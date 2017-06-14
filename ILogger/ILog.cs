@@ -12,10 +12,10 @@ namespace ILogger
         bool CanAddWarning { get; set; }
         bool CanAddInfo { get; set; }
 
-        void Log(Priority logPriority,string who, string what, DateTime when);
+        Guid Log(LogModel model);
     }
 
-    public enum Priority
+    public enum TypeOfLog
     {
         Error,
         Warning,

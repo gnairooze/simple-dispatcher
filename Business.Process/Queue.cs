@@ -19,6 +19,8 @@ namespace SimpleDispatcher.Business.Process
 
         static Data.Model.QueueDbContext _db = new Data.Model.QueueDbContext();
         static Execution _exec = null;
+        protected int _Counter;
+        protected Guid _Group;
         #endregion
 
         #region constructors
@@ -55,10 +57,14 @@ namespace SimpleDispatcher.Business.Process
         public ILogger.ILog Logger { private get; set; }
         #endregion
 
-        public void Run()
+        #region entry methods
+        public void Run(string clientIP)
         {
-            loadRequests();
-            startProcessing();
+            this._Counter = 1;
+            this._Group = Guid.NewGuid();
+
+            loadRequests(clientIP);
+            startProcessing(clientIP);
         }
 
         public void RunAsync()
@@ -66,26 +72,32 @@ namespace SimpleDispatcher.Business.Process
             loadRequests();
             startProcessingAsync();
         }
-
-        private void startProcessing()
+        #endregion
+       
+        #region internal methods
+        private void startProcessing(string clientIP)
         {
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, clientIP);
+
             int requestCounter = 0;
             int requestCount = this._DataModelRequests.Count();
-            logInfo(string.Format("start startProcessing with {0} requests", requestCount));
+
+            logInfo(who, string.Format("start startProcessing with {0} requests", requestCount), string.Empty, string.Empty, this._Counter++, this._Group);
 
             foreach (var dataModelRequest in this._DataModelRequests)
             {
                 Business.View.Request.ListView request = new Business.View.Request.ListView(dataModelRequest);
 
                 requestCounter++;
-                logInfo(string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
+
+                logInfo(string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID), "request.ID", request.ID.ToString());
 
                 bool succeeded = _exec.Execute(request);
 
-                logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
+                logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount), "request.ID", request.ID.ToString());
             }
 
-            logInfo("end startProcessing");
+            logInfo("end startProcessing", string.Empty, string.Empty);
         }
 
         private void startProcessingAsync()
@@ -135,32 +147,6 @@ namespace SimpleDispatcher.Business.Process
             }
 
             logInfo("end startProcessing");
-        }
-
-        private string extractError(Exception ex, ref StringBuilder bld)
-        {
-            if(bld == null)
-            {
-                bld = new StringBuilder();
-            }
-
-            if(ex.Data != null && ex.Data.Count > 0)
-            {
-                foreach (DictionaryEntry item in ex.Data)
-                {
-                    bld.AppendLine(String.Format("Data Key:{0}. Data Value:{1}.",item.Key, item.Value));
-                }
-            }
-
-            bld.AppendLine(String.Format("Message:{0}.", ex.Message));
-            bld.AppendLine(String.Format("StackTrace:{0}.", ex.StackTrace));
-
-            if(ex.InnerException != null)
-            {
-                extractError(ex.InnerException, ref bld);
-            }
-
-            return bld.ToString();
         }
 
         private bool updateRequestStatus(ListView request, bool succeeded)
@@ -218,9 +204,11 @@ namespace SimpleDispatcher.Business.Process
             
         }
 
-        private void loadRequests()
+        private void loadRequests(string clientIP)
         {
-            logInfo("start loadRequests");
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, clientIP);
+
+            logInfo(who, "start loadRequests", string.Empty, string.Empty, this._Counter++, this._Group);
 
             DateTime runDate = DateTime.Now;
             this._DataModelRequests = (from dataModel in Queue._db.Request
@@ -238,9 +226,9 @@ namespace SimpleDispatcher.Business.Process
                         orderby dataModel.ID
                         select dataModel).Take(this.TopCount).ToList();
 
-            logInfo("load requests from DB to _DataModelRequests");
+            logInfo(who, "load requests from DB to _DataModelRequests", string.Empty, string.Empty, this._Counter++, this._Group);
 
-            logInfo("end loadRequests");
+            logInfo(who, "end loadRequests", string.Empty, string.Empty, this._Counter++, this._Group);
         }
 
         private void loadOperationsSettings()
@@ -263,15 +251,84 @@ namespace SimpleDispatcher.Business.Process
 
         }
 
-        private void logInfo(string what)
+        private Guid logInfo(string who, string what, string refName, string refValue, int counter, Guid group)
         {
-            this.Logger.Log(ILogger.Priority.Info, this.GetType().ToString(), what, DateTime.Now);
-        }
+            ILogger.LogModel model = new ILogger.LogModel()
+            {
+                 Counter = counter,
+                 Group = group,
+                 LogType = ILogger.TypeOfLog.Info,
+                 ReferenceName = refName,
+                 ReferenceValue = refValue,
+                 What = what,
+                 When = DateTime.Now,
+                 Who = who
+            };
 
-        private void logError(Exception ex, ref StringBuilder bld)
+            return this.Logger.Log(model);
+        }
+        private Guid logError(string who, Exception ex, ref StringBuilder bld, string refName, string refValue, int counter, Guid group)
         {
             string errorDetails = extractError(ex, ref bld);
-            this.Logger.Log(ILogger.Priority.Error, this.GetType().ToString(), errorDetails, DateTime.Now);
+
+            ILogger.LogModel model = new ILogger.LogModel()
+            {
+                Counter = counter,
+                Group = group,
+                LogType = ILogger.TypeOfLog.Info,
+                ReferenceName = refName,
+                ReferenceValue = refValue,
+                What = errorDetails,
+                When = DateTime.Now,
+                Who = who
+            };
+
+            return this.Logger.Log(model);
         }
+        private string extractError(Exception ex, ref StringBuilder bld)
+        {
+            if (bld == null)
+            {
+                bld = new StringBuilder();
+            }
+
+            if (ex.Data != null && ex.Data.Count > 0)
+            {
+                foreach (DictionaryEntry item in ex.Data)
+                {
+                    bld.AppendLine(String.Format("Data Key:{0}. Data Value:{1}.", item.Key, item.Value));
+                }
+            }
+
+            bld.AppendLine(String.Format("Message:{0}.", ex.Message));
+            bld.AppendLine(String.Format("StackTrace:{0}.", ex.StackTrace));
+
+            if (ex.InnerException != null)
+            {
+                extractError(ex.InnerException, ref bld);
+            }
+
+            return bld.ToString();
+        }
+        private string getWho(string method, string clientIp)
+        {
+            string name = System.Net.Dns.GetHostName();
+            System.Net.IPAddress[] ips = System.Net.Dns.GetHostAddresses(name);
+
+            List<string> allIPs = new List<string>();
+
+            if (ips != null)
+            {
+                foreach (System.Net.IPAddress ip in ips)
+                {
+                    allIPs.Add(ip.ToString());
+                }
+            }
+
+            string who = string.Format("Client IP:{0} | HostName:{1} | IPs:{2} | Location:{3} | Assembly:{4} | Class:{5} | Method:{6}", clientIp, name, string.Join(",", allIPs.ToArray()), System.Reflection.Assembly.GetExecutingAssembly().Location, System.Reflection.Assembly.GetExecutingAssembly().FullName, this.GetType().ToString(), method);
+
+            return who;
+        }
+        #endregion
     }
 }
