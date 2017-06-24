@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SimpleDispatcher.Business.View.Request;
-using ILogger;
+using Mora.Logger.ILogger;
 
 namespace SimpleDispatcher.Business.Exec.Generic
 {
@@ -55,7 +55,7 @@ namespace SimpleDispatcher.Business.Exec.Generic
         #endregion
 
         #region properties
-        public ILogger.ILog Logger { protected get; set; }
+        public ILog Logger { protected get; set; }
         public Data.Model.QueueDbContext DB { protected get; set; }
         #endregion
 
@@ -137,11 +137,11 @@ namespace SimpleDispatcher.Business.Exec.Generic
 
         protected Guid logInfo(string who, string what, string refName, string refValue, int counter, Guid group)
         {
-            ILogger.LogModel model = new ILogger.LogModel()
+            LogModel model = new LogModel()
             {
                 Counter = counter,
                 Group = group,
-                LogType = ILogger.TypeOfLog.Info,
+                LogType = TypeOfLog.Info,
                 ReferenceName = refName,
                 ReferenceValue = refValue,
                 What = what,

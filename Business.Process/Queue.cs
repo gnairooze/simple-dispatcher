@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using SimpleDispatcher.Business.View.Request;
 using SimpleDispatcher.Business.Exec.Generic;
 using System.Collections;
+using Mora.Logger.ILogger;
 
 namespace SimpleDispatcher.Business.Process
 {
@@ -24,7 +25,7 @@ namespace SimpleDispatcher.Business.Process
         #endregion
 
         #region constructors
-        public Queue(int queueID, int topCount, ILogger.ILog logger, Vault.ExecType executionType )
+        public Queue(int queueID, int topCount, ILog logger, Vault.ExecType executionType )
         {
             this._Counter = 1;
             this._Group = Guid.NewGuid();
@@ -58,7 +59,7 @@ namespace SimpleDispatcher.Business.Process
         #region properties
         public int QueueID { get; set; }
         public int TopCount { get; set; }
-        public ILogger.ILog Logger { private get; set; }
+        public ILog Logger { private get; set; }
         #endregion
 
         #region entry methods
@@ -277,11 +278,11 @@ namespace SimpleDispatcher.Business.Process
 
         private Guid logInfo(string who, string what, string refName, string refValue, int counter, Guid group)
         {
-            ILogger.LogModel model = new ILogger.LogModel()
+            LogModel model = new LogModel()
             {
                  Counter = counter,
                  Group = group,
-                 LogType = ILogger.TypeOfLog.Info,
+                 LogType = TypeOfLog.Info,
                  ReferenceName = refName,
                  ReferenceValue = refValue,
                  What = what,
@@ -295,11 +296,11 @@ namespace SimpleDispatcher.Business.Process
         {
             string errorDetails = extractError(ex, ref bld);
 
-            ILogger.LogModel model = new ILogger.LogModel()
+            LogModel model = new LogModel()
             {
                 Counter = counter,
                 Group = group,
-                LogType = ILogger.TypeOfLog.Info,
+                LogType = TypeOfLog.Info,
                 ReferenceName = refName,
                 ReferenceValue = refValue,
                 What = errorDetails,

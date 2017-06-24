@@ -12,15 +12,15 @@ namespace SimpleDispatcher.Present.QueueProcessor
         {
             Business.Process.Queue queue = new Business.Process.Queue(QueueProcessor.Properties.Settings.Default.QueueID, 
                 QueueProcessor.Properties.Settings.Default.TopCount, 
-                new ConsoleLogger.SimpleLogger() {
+                new Mora.Logger.MsSqlLogger.DbLogger() {
                     CanAddError = Present.QueueProcessor.Properties.Settings.Default.CanAddError,
                     CanAddInfo = Present.QueueProcessor.Properties.Settings.Default.CanAddInfo,
                     CanAddWarning = Present.QueueProcessor.Properties.Settings.Default.CanAddWarning
                 },
                 Business.Process.Vault.ExecType.ApiWorker);
 
-            //queue.Run();
-            queue.RunAsync(string.Empty);
+            queue.Run("0.0.0.0");
+            //queue.RunAsync(string.Empty);
 
             Console.WriteLine("Press any key to exit ...");
             Console.Read();

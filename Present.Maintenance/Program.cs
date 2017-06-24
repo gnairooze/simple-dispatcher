@@ -8,7 +8,7 @@ namespace SimpleDispatcher.Present.Maintenance
 {
     class Program
     {
-        static ConsoleLogger.SimpleLogger _Logger = new ConsoleLogger.SimpleLogger() {
+        static Mora.Logger.MsSqlLogger.DbLogger _Logger = new Mora.Logger.MsSqlLogger.DbLogger() {
             CanAddError = Present.Maintenance.Properties.Settings.Default.CanAddError,
             CanAddInfo = Present.Maintenance.Properties.Settings.Default.CanAddInfo,
             CanAddWarning = Present.Maintenance.Properties.Settings.Default.CanAddWarning
@@ -76,11 +76,11 @@ namespace SimpleDispatcher.Present.Maintenance
 
         private static Guid logInfo(string who, string what, string refName, string refValue, int counter, Guid group)
         {
-            ILogger.LogModel model = new ILogger.LogModel()
+            Mora.Logger.ILogger.LogModel model = new Mora.Logger.ILogger.LogModel()
             {
                 Counter = counter,
                 Group = group,
-                LogType = ILogger.TypeOfLog.Info,
+                LogType = Mora.Logger.ILogger.TypeOfLog.Info,
                 ReferenceName = refName,
                 ReferenceValue = refValue,
                 What = what,
