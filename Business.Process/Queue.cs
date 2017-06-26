@@ -278,6 +278,15 @@ namespace SimpleDispatcher.Business.Process
 
         private Guid logInfo(string who, string what, string refName, string refValue, int counter, Guid group)
         {
+            if (string.IsNullOrEmpty(refName))
+            {
+                refName = "N/A";
+            }
+            if (string.IsNullOrEmpty(refValue))
+            {
+                refValue = "N/A";
+            }
+
             LogModel model = new LogModel()
             {
                  Counter = counter,
@@ -290,7 +299,11 @@ namespace SimpleDispatcher.Business.Process
                  Who = who
             };
 
-            return this.Logger.Log(model);
+            Guid result = Guid.Empty;
+
+            result = this.Logger.Log(model);
+            
+            return result;
         }
         private Guid logError(string who, Exception ex, ref StringBuilder bld, string refName, string refValue, int counter, Guid group)
         {
