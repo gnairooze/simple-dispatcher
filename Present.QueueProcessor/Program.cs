@@ -10,7 +10,7 @@ namespace SimpleDispatcher.Present.QueueProcessor
     {
         static void Main(string[] args)
         {
-            Business.Process.Queue queue = new Business.Process.Queue(QueueProcessor.Properties.Settings.Default.QueueID, 
+            Business.Process.Queue queue = new Business.Process.Queue(string.Empty, QueueProcessor.Properties.Settings.Default.QueueID, 
                 QueueProcessor.Properties.Settings.Default.TopCount, 
                 new ConsoleLogger.SimpleLogger() {
                     CanAddError = Present.QueueProcessor.Properties.Settings.Default.CanAddError,
@@ -20,7 +20,7 @@ namespace SimpleDispatcher.Present.QueueProcessor
                 Business.Process.Vault.ExecType.ApiWorker);
 
             //queue.Run();
-            queue.RunAsync();
+            queue.RunAsync(string.Empty);
 
             Console.WriteLine("Press any key to exit ...");
             Console.Read();

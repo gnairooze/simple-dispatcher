@@ -21,10 +21,11 @@ namespace SimpleDispatcher.Business.Process
         static Execution _exec = null;
         protected int _Counter;
         protected Guid _Group;
+        
         #endregion
 
         #region constructors
-        public Queue(int queueID, int topCount, ILogger.ILog logger, Vault.ExecType executionType )
+        public Queue(string clientIP, int queueID, int topCount, ILogger.ILog logger, Vault.ExecType executionType )
         {
             this.Logger = logger;
 
@@ -32,7 +33,7 @@ namespace SimpleDispatcher.Business.Process
             Queue._exec = execfactory.GetExecution(executionType);
             Queue._exec.ExecutionCompleted += _exec_ExecutionCompleted;
 
-            loadOperationsSettings();
+            loadOperationsSettings(clientIP);
             
             this.QueueID = queueID;
             this.TopCount = topCount;
@@ -40,13 +41,13 @@ namespace SimpleDispatcher.Business.Process
 
         private void _exec_ExecutionCompleted(object sender, ExecutionCompletedEventArgs e)
         {
-            logInfo(string.Format("execution completed event triggered for request with ID {0} and status {1}", e.Request.ID, e.Succeeded ? "succeeded" : "failed"));
+            logInfo(e.ClientIP, string.Format("execution completed event triggered for request with ID {0} and status {1}", e.Request.ID, e.Succeeded ? "succeeded" : "failed"));
 
-            logInfo(string.Format("start updating request with ID {0}", e.Request.ID));
+            logInfo(e.ClientIP, string.Format("start updating request with ID {0}", e.Request.ID));
 
-            bool result = updateRequestStatus(e.Request, e.Succeeded);
+            bool result = updateRequestStatus(e.ClientIP, e.Request, e.Succeeded);
 
-            logInfo(string.Format("end updating request with ID {0}", e.Request.ID));
+            logInfo(e.ClientIP, string.Format("end updating request with ID {0}", e.Request.ID));
 
         }
         #endregion
@@ -67,22 +68,20 @@ namespace SimpleDispatcher.Business.Process
             startProcessing(clientIP);
         }
 
-        public void RunAsync()
+        public void RunAsync(string clientIP)
         {
-            loadRequests();
-            startProcessingAsync();
+            loadRequests(clientIP);
+            startProcessingAsync(clientIP);
         }
         #endregion
        
         #region internal methods
         private void startProcessing(string clientIP)
         {
-            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, clientIP);
-
             int requestCounter = 0;
             int requestCount = this._DataModelRequests.Count();
 
-            logInfo(who, string.Format("start startProcessing with {0} requests", requestCount), string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo(clientIP, string.Format("start startProcessing with {0} requests", requestCount));
 
             foreach (var dataModelRequest in this._DataModelRequests)
             {
@@ -90,21 +89,21 @@ namespace SimpleDispatcher.Business.Process
 
                 requestCounter++;
 
-                logInfo(string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID), "request.ID", request.ID.ToString());
+                logInfo(clientIP, string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
 
                 bool succeeded = _exec.Execute(request);
 
-                logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount), "request.ID", request.ID.ToString());
+                logInfo(clientIP, string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
             }
 
-            logInfo("end startProcessing", string.Empty, string.Empty);
+            logInfo(clientIP, "end startProcessing");
         }
 
-        private void startProcessingAsync()
+        private void startProcessingAsync(string clientIP)
         {
             int requestCounter = 0;
             int requestCount = this._DataModelRequests.Count();
-            logInfo(string.Format("start startProcessing with {0} requests", requestCount));
+            logInfo(clientIP, string.Format("start startProcessing with {0} requests", requestCount));
 
             //Parallel.ForEach(this._DataModelRequests, dataModelRequest => SomeMethod(x));
 
@@ -115,11 +114,11 @@ namespace SimpleDispatcher.Business.Process
                 Business.View.Request.ListView request = new Business.View.Request.ListView(dataModelRequest);
 
                 requestCounter++;
-                logInfo(string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
+                logInfo(clientIP, string.Format("start executing {0} of {1} requests with ID {2}", requestCounter, requestCount, request.ID));
 
                 tasks.Add(_exec.ExecuteAsync(request));
 
-                logInfo(string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
+                logInfo(clientIP, string.Format("end executing {0} of {1} requests", requestCounter, requestCount));
             }
 
             StringBuilder errorLogBuilder = new StringBuilder();
@@ -130,12 +129,12 @@ namespace SimpleDispatcher.Business.Process
             }
             catch(AggregateException ae)
             {
-                logError(ae.GetBaseException(), ref errorLogBuilder);
-                logError(ae, ref errorLogBuilder);
+                logError(clientIP, ae.GetBaseException(), ref errorLogBuilder);
+                logError(clientIP, ae, ref errorLogBuilder);
 
                 ae.Handle((x) =>
                 {
-                    logError(x, ref errorLogBuilder);
+                    logError(clientIP, x, ref errorLogBuilder);
 
                     return true;
                 });
@@ -143,15 +142,15 @@ namespace SimpleDispatcher.Business.Process
             }
             catch (Exception ex)
             {
-                logError(ex, ref errorLogBuilder);
+                logError(clientIP, ex, ref errorLogBuilder);
             }
 
-            logInfo("end startProcessing");
+            logInfo(clientIP, "end startProcessing");
         }
 
-        private bool updateRequestStatus(ListView request, bool succeeded)
+        private bool updateRequestStatus(string clientIP, ListView request, bool succeeded)
         {
-            logInfo(string.Format("start updateRequestStatus of request with ID {0} to be {1}", request.ID, succeeded?"succeeded":"failed"));
+            logInfo(clientIP, string.Format("start updateRequestStatus of request with ID {0} to be {1}", request.ID, succeeded?"succeeded":"failed"));
 
             Business.View.OperationSettings.ListView operationSettings = this._OperationsSettings.Single(o => o.Operation == request.Operation);
 
@@ -167,14 +166,14 @@ namespace SimpleDispatcher.Business.Process
                 {
                     request.Status = View.Vault.RequestStatus.Failed;
                     request.NextRetryOn = null;
-                    logInfo(string.Format("request with ID {0} consumed all retrial count. It is marked as failed", request.ID));
+                    logInfo(clientIP, string.Format("request with ID {0} consumed all retrial count. It is marked as failed", request.ID));
                 }
                 else
                 {
                     request.Status = View.Vault.RequestStatus.Retrying;
                     request.NextRetryOn = DateTime.Now.AddSeconds(operationSettings.RetrialDelay);
 
-                    logInfo(string.Format("request with ID {0} is marked for retrial. Remaining retirals is {1}. Next retry on {2}", request.ID, request.RemainingRetrials, request.NextRetryOn));
+                    logInfo(clientIP, string.Format("request with ID {0} is marked for retrial. Remaining retirals is {1}. Next retry on {2}", request.ID, request.RemainingRetrials, request.NextRetryOn));
                 }
             }
 
@@ -182,23 +181,23 @@ namespace SimpleDispatcher.Business.Process
 
             if(dataModel.ModifiedOn != request.ModifiedOn)
             {
-                logInfo(string.Format("the request with ID {0} failed to be updated because it was modified during the processing. started processing with modified on {1} and now modified on is {2}", request.ID, request.ModifiedOn, dataModel.ModifiedOn));
+                logInfo(clientIP, string.Format("the request with ID {0} failed to be updated because it was modified during the processing. started processing with modified on {1} and now modified on is {2}", request.ID, request.ModifiedOn, dataModel.ModifiedOn));
 
-                logInfo("end updateRequestStatus of request");
+                logInfo(clientIP, "end updateRequestStatus of request");
 
                 return false;
             }
 
             request.CopyDataTo(dataModel);
-            logInfo("data copied from the request list view to the data model");
+            logInfo(clientIP, "data copied from the request list view to the data model");
 
             dataModel.ModifiedOn = DateTime.Now;
 
             Queue._db.SaveChanges();
 
-            logInfo(string.Format("request with ID {0} updated in DB", request.ID));
+            logInfo(clientIP, string.Format("request with ID {0} updated in DB", request.ID));
 
-            logInfo("end updateRequestStatus of request");
+            logInfo(clientIP, "end updateRequestStatus of request");
 
             return true;
             
@@ -206,9 +205,7 @@ namespace SimpleDispatcher.Business.Process
 
         private void loadRequests(string clientIP)
         {
-            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, clientIP);
-
-            logInfo(who, "start loadRequests", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo(clientIP, "start loadRequests");
 
             DateTime runDate = DateTime.Now;
             this._DataModelRequests = (from dataModel in Queue._db.Request
@@ -226,14 +223,14 @@ namespace SimpleDispatcher.Business.Process
                         orderby dataModel.ID
                         select dataModel).Take(this.TopCount).ToList();
 
-            logInfo(who, "load requests from DB to _DataModelRequests", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo(clientIP, "load requests from DB to _DataModelRequests");
 
-            logInfo(who, "end loadRequests", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo(clientIP, "end loadRequests");
         }
 
-        private void loadOperationsSettings()
+        private void loadOperationsSettings(string clientIP)
         {
-            logInfo("start loadOperationsSettings");
+            logInfo(clientIP, "start loadOperationsSettings");
 
             var query = from dataModel in Queue._db.OperationSettings
                         select dataModel;
@@ -245,21 +242,23 @@ namespace SimpleDispatcher.Business.Process
                 _OperationsSettings.Add(new View.OperationSettings.ListView(dataModel));
             }
 
-            logInfo("operations settings read from DB to _OperationsSettings");
+            logInfo(clientIP, "operations settings read from DB to _OperationsSettings");
 
-            logInfo("end loadOperationsSettings");
+            logInfo(clientIP, "end loadOperationsSettings");
 
         }
 
-        private Guid logInfo(string who, string what, string refName, string refValue, int counter, Guid group)
+        private Guid logInfo(string clientIP, string what)
         {
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, clientIP);
+
             ILogger.LogModel model = new ILogger.LogModel()
             {
-                 Counter = counter,
-                 Group = group,
+                 Counter = this._Counter,
+                 Group = this._Group,
                  LogType = ILogger.TypeOfLog.Info,
-                 ReferenceName = refName,
-                 ReferenceValue = refValue,
+                 ReferenceName = "Class",
+                 ReferenceValue = "Business.Process",
                  What = what,
                  When = DateTime.Now,
                  Who = who
@@ -267,17 +266,19 @@ namespace SimpleDispatcher.Business.Process
 
             return this.Logger.Log(model);
         }
-        private Guid logError(string who, Exception ex, ref StringBuilder bld, string refName, string refValue, int counter, Guid group)
+        private Guid logError(string clientIP, Exception ex, ref StringBuilder bld)
         {
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, clientIP);
+
             string errorDetails = extractError(ex, ref bld);
 
             ILogger.LogModel model = new ILogger.LogModel()
             {
-                Counter = counter,
-                Group = group,
-                LogType = ILogger.TypeOfLog.Info,
-                ReferenceName = refName,
-                ReferenceValue = refValue,
+                Counter = this._Counter,
+                Group = this._Group,
+                LogType = ILogger.TypeOfLog.Error,
+                ReferenceName = "Class",
+                ReferenceValue = "Business.Process",
                 What = errorDetails,
                 When = DateTime.Now,
                 Who = who

@@ -12,6 +12,7 @@ namespace SimpleDispatcher.Business.Exec.Generic
         public Business.View.Request.ListView Request { get; set; }
         public IExecutionWorker Worker { get; set; }
         public bool Succeeded { get; set; }
+        public string ClientIP { get; set; }
         #endregion
     }
 }

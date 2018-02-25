@@ -15,6 +15,8 @@ namespace SimpleDispatcher.Business.Exec.Generic
         #region attributes
         protected List<IExecutionWorker> _ExecutionWorkers = new List<IExecutionWorker>();
         protected List<IExecutionWorkerAsync> _ExecutionWorkersAsync = new List<IExecutionWorkerAsync>();
+        private Guid _ExecutionBusinessID = Guid.NewGuid();
+        private int _LoggerCounter = 0;
         #endregion
 
         #region constructors
@@ -113,7 +115,20 @@ namespace SimpleDispatcher.Business.Exec.Generic
 
         protected void logInfo(string what)
         {
-            this.Logger.Log(ILogger.Priority.Info, this.GetType().ToString(), what, DateTime.Now);
+            ILogger.LogModel logModel = new LogModel()
+            {
+                BusinessID = this._ExecutionBusinessID,
+                Counter = this._LoggerCounter++,
+                CreatedOn = DateTime.Now,
+                Group = this._ExecutionBusinessID,
+                LogType = TypeOfLog.Info,
+                ReferenceName = "Class",
+                ReferenceValue = "Business.Exec.Generic",
+                What = what,
+                When = DateTime.Now,
+                Who = "System"
+            };
+            this.Logger.Log(logModel);
         }
     }
 }

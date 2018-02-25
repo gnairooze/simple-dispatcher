@@ -14,6 +14,9 @@ namespace SimpleDispatcher.Present.Maintenance
             CanAddWarning = Present.Maintenance.Properties.Settings.Default.CanAddWarning
         };
 
+        static int _Counter = 0;
+        static Guid _BusinessID = Guid.NewGuid();
+
         static void Main(string[] args)
         {
             DateTime runDate = DateTime.Now;
@@ -70,7 +73,41 @@ namespace SimpleDispatcher.Present.Maintenance
 
         private static void logInfo(string what)
         {
-            _Logger.Log(ILogger.Priority.Info, "SimpleDispatcher.Present.Maintenance.Program", what, DateTime.Now);
+            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, string.Empty);
+
+            ILogger.LogModel model = new ILogger.LogModel()
+            {
+                 Counter = _Counter,
+                 Group = _BusinessID,
+                 LogType = ILogger.TypeOfLog.Info,
+                 ReferenceName = "Class",
+                 ReferenceValue = "Present.Maintenance.Program",
+                 What = what,
+                 When = DateTime.Now,
+                 Who = who
+            };
+
+            _Logger.Log(model);
+        }
+
+        private static string getWho(string method, string clientIp)
+        {
+            string name = System.Net.Dns.GetHostName();
+            System.Net.IPAddress[] ips = System.Net.Dns.GetHostAddresses(name);
+
+            List<string> allIPs = new List<string>();
+
+            if (ips != null)
+            {
+                foreach (System.Net.IPAddress ip in ips)
+                {
+                    allIPs.Add(ip.ToString());
+                }
+            }
+
+            string who = string.Format("Client IP:{0} | HostName:{1} | IPs:{2} | Location:{3} | Assembly:{4} | Class:{5} | Method:{6}", clientIp, name, string.Join(",", allIPs.ToArray()), System.Reflection.Assembly.GetExecutingAssembly().Location, System.Reflection.Assembly.GetExecutingAssembly().FullName, "Present.Maintenance.Program", method);
+
+            return who;
         }
     }
 }
