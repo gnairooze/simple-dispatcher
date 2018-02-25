@@ -1,4 +1,4 @@
-﻿using Mora.Logger.ILogger;
+﻿using ILogger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace SimpleDispatcher.Business.Process
         #endregion
 
         #region properties
-        public ILog Logger { private get; set; }
+        public ILogger.ILog Logger { private get; set; }
         public Data.Model.QueueDbContext DB { private get; set; }
         #endregion
 

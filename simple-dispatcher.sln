@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILogger", "ILogger\ILogger.csproj", "{428A816D-27C6-4E73-895D-406CEE8B27D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleLogger", "ConsoleLogger\ConsoleLogger.csproj", "{5BC57CA9-DA23-4F7C-B6DF-88E74CFE187F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data.Model", "Data.Model\Data.Model.csproj", "{05A94AA9-CAC1-46A1-928B-17ECAAFF7776}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.View", "Business.View\Business.View.csproj", "{F83D5BDD-DD12-42E3-B462-0445F7CCF0E4}"
@@ -28,30 +32,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.Request", "Business.Request\Business.Request.csproj", "{83577118-D8B4-4053-9D7F-658C72BCBE86}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External DLLs", "External DLLs", "{38983137-882D-4979-9EAB-A6D1B4BCEFAC}"
+	ProjectSection(SolutionItems) = preProject
+		External DLLs\Mora.Common.Method.Parameter.dll = External DLLs\Mora.Common.Method.Parameter.dll
+		External DLLs\Mora.Common.Method.Parameter.pdb = External DLLs\Mora.Common.Method.Parameter.pdb
+		External DLLs\Mora.Common.Vault.dll = External DLLs\Mora.Common.Vault.dll
+		External DLLs\Mora.Common.Vault.pdb = External DLLs\Mora.Common.Vault.pdb
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Business.OperationSettings", "Business.OperationSettings\Business.OperationSettings.csproj", "{AD6916AE-D082-402E-A151-127748D3A61F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mora.Common", "Mora.Common", "{B7297EC4-600D-4C99-878F-A66051EEAF29}"
-	ProjectSection(SolutionItems) = preProject
-		External DLLs\Mora.Common\Mora.Common.Method.Parameter.dll = External DLLs\Mora.Common\Mora.Common.Method.Parameter.dll
-		External DLLs\Mora.Common\Mora.Common.Method.Parameter.pdb = External DLLs\Mora.Common\Mora.Common.Method.Parameter.pdb
-		External DLLs\Mora.Common\Mora.Common.Vault.dll = External DLLs\Mora.Common\Mora.Common.Vault.dll
-		External DLLs\Mora.Common\Mora.Common.Vault.pdb = External DLLs\Mora.Common\Mora.Common.Vault.pdb
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mora.Logger", "Mora.Logger", "{564CA019-52C8-4F50-A384-4316E67CBF42}"
-	ProjectSection(SolutionItems) = preProject
-		External DLLs\Mora.Logger\create Mora.Logger.MsSqlLogger schema.sql = External DLLs\Mora.Logger\create Mora.Logger.MsSqlLogger schema.sql
-		External DLLs\Mora.Logger\EntityFramework.dll = External DLLs\Mora.Logger\EntityFramework.dll
-		External DLLs\Mora.Logger\EntityFramework.SqlServer.dll = External DLLs\Mora.Logger\EntityFramework.SqlServer.dll
-		External DLLs\Mora.Logger\EntityFramework.SqlServer.xml = External DLLs\Mora.Logger\EntityFramework.SqlServer.xml
-		External DLLs\Mora.Logger\EntityFramework.xml = External DLLs\Mora.Logger\EntityFramework.xml
-		External DLLs\Mora.Logger\Mora.Logger.ILogger.dll = External DLLs\Mora.Logger\Mora.Logger.ILogger.dll
-		External DLLs\Mora.Logger\Mora.Logger.ILogger.pdb = External DLLs\Mora.Logger\Mora.Logger.ILogger.pdb
-		External DLLs\Mora.Logger\Mora.Logger.MsSqlLogger.dll = External DLLs\Mora.Logger\Mora.Logger.MsSqlLogger.dll
-		External DLLs\Mora.Logger\Mora.Logger.MsSqlLogger.dll.config = External DLLs\Mora.Logger\Mora.Logger.MsSqlLogger.dll.config
-		External DLLs\Mora.Logger\Mora.Logger.MsSqlLogger.pdb = External DLLs\Mora.Logger\Mora.Logger.MsSqlLogger.pdb
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +47,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{428A816D-27C6-4E73-895D-406CEE8B27D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{428A816D-27C6-4E73-895D-406CEE8B27D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{428A816D-27C6-4E73-895D-406CEE8B27D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{428A816D-27C6-4E73-895D-406CEE8B27D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BC57CA9-DA23-4F7C-B6DF-88E74CFE187F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BC57CA9-DA23-4F7C-B6DF-88E74CFE187F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BC57CA9-DA23-4F7C-B6DF-88E74CFE187F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BC57CA9-DA23-4F7C-B6DF-88E74CFE187F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{05A94AA9-CAC1-46A1-928B-17ECAAFF7776}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{05A94AA9-CAC1-46A1-928B-17ECAAFF7776}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05A94AA9-CAC1-46A1-928B-17ECAAFF7776}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -114,9 +110,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{B7297EC4-600D-4C99-878F-A66051EEAF29} = {38983137-882D-4979-9EAB-A6D1B4BCEFAC}
-		{564CA019-52C8-4F50-A384-4316E67CBF42} = {38983137-882D-4979-9EAB-A6D1B4BCEFAC}
 	EndGlobalSection
 EndGlobal

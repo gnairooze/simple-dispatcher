@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mora.Logger.ILogger;
+using ILogger;
 using SimpleDispatcher.Business.Exec.Generic;
 
 namespace SimpleDispatcher.Business.Exec.API
@@ -18,9 +18,7 @@ namespace SimpleDispatcher.Business.Exec.API
 
         protected override void loadExecutionWorkers()
         {
-            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, string.Empty);
-
-            logInfo(who, "start loadExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo("start loadExecutionWorkers");
 
             var query = from dataModel in this.DB.Worker
                         select dataModel;
@@ -38,16 +36,14 @@ namespace SimpleDispatcher.Business.Exec.API
                 _ExecutionWorkers.Add(worker);
             }
 
-            logInfo(who, "workers read from DB to _ExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo("workers read from DB to _ExecutionWorkers");
 
-            logInfo(who, "end loadExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo("end loadExecutionWorkers");
         }
 
         protected override void loadExecutionWorkersAsync()
         {
-            string who = getWho(System.Reflection.MethodInfo.GetCurrentMethod().Name, string.Empty);
-
-            logInfo(who, "start loadExecutionWorkersAsync", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo("start loadExecutionWorkersAsync");
 
             var query = from dataModel in this.DB.Worker
                         select dataModel;
@@ -65,9 +61,9 @@ namespace SimpleDispatcher.Business.Exec.API
                 _ExecutionWorkersAsync.Add(worker);
             }
 
-            logInfo(who, "workers read from DB to _ExecutionWorkers", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo("workers read from DB to _ExecutionWorkers");
 
-            logInfo(who, "end loadExecutionWorkersAsync", string.Empty, string.Empty, this._Counter++, this._Group);
+            logInfo("end loadExecutionWorkersAsync");
         }
 
     }
