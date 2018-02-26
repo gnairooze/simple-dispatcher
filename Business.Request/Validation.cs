@@ -41,6 +41,18 @@ namespace SimpleDispatcher.Business.Request
                 result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
                 result.Data.Add("Operation is empty");
             }
+            else if (string.IsNullOrWhiteSpace(request.ReferenceName))
+            {
+                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
+                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
+                result.Data.Add("ReferenceName is empty");
+            }
+            else if (string.IsNullOrWhiteSpace(request.ReferenceValue))
+            {
+                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
+                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
+                result.Data.Add("ReferenceValue is empty");
+            }
             #endregion
 
             #region validate operation existed
@@ -50,6 +62,16 @@ namespace SimpleDispatcher.Business.Request
                 result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
                 result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
                 result.Data.Add("This operation has not been defined in DB");
+            }
+            #endregion
+
+             #region validate operation existed
+            bool requestDuplicated = DB.Request.Any(r => r.BusinessID == request.BusinessID && r.Operation.ToLower() == request.Operation.ToLower());
+            if (requestDuplicated)
+            {
+                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
+                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
+                result.Data.Add("This request already added to DB before");
             }
             #endregion
 

@@ -17,8 +17,8 @@ namespace SimpleDispatcher.Business.Process
 
         protected List<Data.Model.Request> _DataModelRequests;
 
-        static Data.Model.QueueDbContext _db = new Data.Model.QueueDbContext();
-        static Execution _exec = null;
+        protected Data.Model.QueueDbContext _db = new Data.Model.QueueDbContext();
+        protected Execution _exec = null;
         protected int _Counter;
         protected Guid _Group;
         
@@ -29,9 +29,9 @@ namespace SimpleDispatcher.Business.Process
         {
             this.Logger = logger;
 
-            ExecFactory execfactory = new ExecFactory(this.Logger, Queue._db);
-            Queue._exec = execfactory.GetExecution(executionType);
-            Queue._exec.ExecutionCompleted += _exec_ExecutionCompleted;
+            ExecFactory execfactory = new ExecFactory(this.Logger, this._db);
+            this._exec = execfactory.GetExecution(executionType);
+            this._exec.ExecutionCompleted += _exec_ExecutionCompleted;
 
             loadOperationsSettings(clientIP);
             
@@ -61,17 +61,34 @@ namespace SimpleDispatcher.Business.Process
         #region entry methods
         public void Run(string clientIP)
         {
+            if (this._db == null)
+            {
+                this._db = new Data.Model.QueueDbContext();
+            }
+
             this._Counter = 1;
             this._Group = Guid.NewGuid();
 
             loadRequests(clientIP);
             startProcessing(clientIP);
+
+            this._db.Dispose();
+            this._db = null;
         }
 
+        //need some tuning as generates a lot of entity framework errors
         public void RunAsync(string clientIP)
         {
+            if (this._db == null)
+            {
+                this._db = new Data.Model.QueueDbContext();
+            }
+
             loadRequests(clientIP);
             startProcessingAsync(clientIP);
+
+            this._db.Dispose();
+            this._db = null;
         }
         #endregion
        
@@ -98,7 +115,7 @@ namespace SimpleDispatcher.Business.Process
 
             logInfo(clientIP, "end startProcessing");
         }
-
+        //need some tuning as generates a lot of entity framework errors
         private void startProcessingAsync(string clientIP)
         {
             int requestCounter = 0;
@@ -177,7 +194,7 @@ namespace SimpleDispatcher.Business.Process
                 }
             }
 
-            Data.Model.Request dataModel = Queue._db.Request.Single(r => r.ID == request.ID);
+            Data.Model.Request dataModel = this._db.Request.Single(r => r.ID == request.ID);
 
             if(dataModel.ModifiedOn != request.ModifiedOn)
             {
@@ -193,7 +210,7 @@ namespace SimpleDispatcher.Business.Process
 
             dataModel.ModifiedOn = DateTime.Now;
 
-            Queue._db.SaveChanges();
+            this._db.SaveChanges();
 
             logInfo(clientIP, string.Format("request with ID {0} updated in DB", request.ID));
 
@@ -208,7 +225,7 @@ namespace SimpleDispatcher.Business.Process
             logInfo(clientIP, "start loadRequests");
 
             DateTime runDate = DateTime.Now;
-            this._DataModelRequests = (from dataModel in Queue._db.Request
+            this._DataModelRequests = (from dataModel in this._db.Request
                         where dataModel.QueueID == this.QueueID
                         && 
                         (
@@ -232,7 +249,7 @@ namespace SimpleDispatcher.Business.Process
         {
             logInfo(clientIP, "start loadOperationsSettings");
 
-            var query = from dataModel in Queue._db.OperationSettings
+            var query = from dataModel in this._db.OperationSettings
                         select dataModel;
 
             _OperationsSettings = new List<View.OperationSettings.ListView>();

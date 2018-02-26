@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicSetting.cs" />
     <Compile Include="Migrations\201706091227149_CreateSPsDeleteRequests.cs" />
     <Compile Include="Migrations\201706091227149_CreateSPsDeleteRequests.Designer.cs">
       <DependentUpon>201706091227149_CreateSPsDeleteRequests.cs</DependentUpon>

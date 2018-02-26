@@ -12,6 +12,7 @@ namespace TestAPI.Controllers
 {
     public class ValuesController : ApiController
     {
+        private Models.TestAPI_DbContext _DbContext = new Models.TestAPI_DbContext();
         // GET api/values/5
         public string Get()
         {
@@ -25,16 +26,21 @@ namespace TestAPI.Controllers
 
             HttpResponseMessage response = new HttpResponseMessage();
             response.Content = new StringContent(string.Format("This is a test - {0}", counter));
-            Thread.Sleep(5000);
+            response.StatusCode = HttpStatusCode.OK;
 
-            if(counter % 13 == 0)
+            this._DbContext.API_Calls.Add(new Models.API_Call()
             {
-                response.StatusCode = HttpStatusCode.BadRequest;
-            }
-            else
-            {
-                response.StatusCode = HttpStatusCode.OK;
-            }
+                Created = DateTime.Now,
+                ID = Guid.NewGuid(),
+                Operation = data["operation"].ToString(),
+                Reference_Name = data["referenceName"].ToString(),
+                Reference_Value = data["referenceValue"].ToString(),
+                Request = data.ToString(),
+                Response = response.ToString(),
+                ResponseCode = (int)response.StatusCode
+            });
+
+            this._DbContext.SaveChanges();
 
             return response;
         }

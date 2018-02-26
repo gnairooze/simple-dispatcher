@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,8 @@ namespace SimpleDispatcher.Test.QueueProcessor
         {
             deleteOperationsSettings();
 
+            fillBasicSettings();
+
             Guid worker_BusinessID = Guid.Parse("A92DF39B-EEC6-4967-989C-9C3177BE1231");
             long worker_ID = 1;
 
@@ -21,6 +24,18 @@ namespace SimpleDispatcher.Test.QueueProcessor
 
             fillOperationsSettings(worker_BusinessID, worker_ID);
             fillRequests();
+        }
+
+        private static void fillBasicSettings()
+        {
+            TestData._DB.BasicSettings.Add(new Data.Model.BasicSetting()
+            {
+                CreatedOn = DateTime.Now,
+                Description = "Max Queue value determines how many instances will run to process the queue",
+                ModifiedOn = DateTime.Now,
+                Name = "Max_Queue",
+                Value = "2"
+            });
         }
 
         public static void ResetRequests()
@@ -44,12 +59,14 @@ namespace SimpleDispatcher.Test.QueueProcessor
 
             for (int i = 0; i < 20000; i++)
             {
+                string data = generateJSON("Test Data " + Convert.ToChar(65 + (i % 4)), "Operation " + Convert.ToChar(65 + (i % 4)), "Test Reference ID", (i % 7000).ToString());
+
                 TestData._DB.Request.Add(new Data.Model.Request()
                 {
                     ID = i,
                     BusinessID = Guid.NewGuid(),
                     CreatedOn = DateTime.Now,
-                    Data = "Test Data " + Convert.ToChar(65 + (i % 4)),
+                    Data = data,
                     ModifiedOn = DateTime.Now,
                     NextRetryOn = null,
                     Operation = "Operation " + Convert.ToChar(65 + (i % 4)),
@@ -67,6 +84,17 @@ namespace SimpleDispatcher.Test.QueueProcessor
             TestData._DB.SaveChanges();
         }
 
+        private static string generateJSON(string data, string operation, string referenceName, string referenceValue)
+        {
+            JObject o = JObject.Parse(@"{
+  'Operation': '"+operation+@"',
+  'Reference_Name': '"+referenceName+@"',
+  'Reference_Value': '"+referenceValue+@"',
+  'Data': '"+data+@"'
+}");
+
+            return o.ToString();
+        }
         private static void fillOperationsSettings(Guid worker_BusinessID, long worker_ID)
         {
             for (int i = 0; i < 4; i++)
