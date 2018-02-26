@@ -23,7 +23,7 @@ namespace DBLogger
         [Required]
         public byte LogType { get; set; }
         [Required]
-        [MaxLength(100)]
+        [MaxLength(500)]
         public string Who { get; set; }
         [Required]
         public string What { get; set; }

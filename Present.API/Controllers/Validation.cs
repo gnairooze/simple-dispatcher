@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Web;
 
-namespace SimpleDispatcher.Business.Request
+namespace SimpleDispatcher.Present.API.Controllers
 {
     internal class Validation
     {
-        public static Data.Model.QueueDbContext DB { get; set; }
-        public static Mora.Common.Method.Parameter.Result<List<string>> ValidateAdd(Business.View.Request.AddView request)
+        public static Mora.Common.Method.Parameter.Result<List<string>> ValidateAdd(JObject data)
         {
             Mora.Common.Method.Parameter.Result<List<string>> result = new Mora.Common.Method.Parameter.Result<List<string>>() {
                 BusinessID = Guid.NewGuid(),
@@ -19,7 +18,7 @@ namespace SimpleDispatcher.Business.Request
                 ID = 0
             };
 
-            if (request == null)
+            if (data == null)
             {
                 result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_TECH_ERROR_CODE;
                 result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_TECH_ERROR_DESCRIPTION;
@@ -29,49 +28,56 @@ namespace SimpleDispatcher.Business.Request
             }
 
             #region validate required fields
-            if (request.BusinessID == Guid.Empty)
+            if (data["businessID"] == null)
             {
                 result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
                 result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
-                result.Data.Add("BusinessID is empty");
+                result.Data.Add("businessID is missing");
             }
-            else if (string.IsNullOrWhiteSpace(request.Operation))
+            else if (data["businessID"].ToString().Trim() == string.Empty)
             {
                 result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
                 result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
-                result.Data.Add("Operation is empty");
+                result.Data.Add("businessID is empty");
             }
-            else if (string.IsNullOrWhiteSpace(request.ReferenceName))
-            {
-                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
-                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
-                result.Data.Add("ReferenceName is empty");
-            }
-            else if (string.IsNullOrWhiteSpace(request.ReferenceValue))
-            {
-                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
-                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
-                result.Data.Add("ReferenceValue is empty");
-            }
-            #endregion
 
-            #region validate operation existed
-            bool operationSettingsExisted = DB.OperationSettings.Any(o => o.Operation.ToLower() == request.Operation.ToLower());
-            if (!operationSettingsExisted)
+            if (data["operation"] == null)
             {
                 result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
                 result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
-                result.Data.Add("This operation has not been defined in DB");
+                result.Data.Add("operation is missing");
             }
-            #endregion
-
-             #region validate operation existed
-            bool requestDuplicated = DB.Request.Any(r => r.BusinessID == request.BusinessID && r.Operation.ToLower() == request.Operation.ToLower());
-            if (requestDuplicated)
+            else if (data["operation"].ToString().Trim() == string.Empty)
             {
                 result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
                 result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
-                result.Data.Add("This request already added to DB before");
+                result.Data.Add("operation is empty");
+            }
+
+            if (data["referenceName"] == null)
+            {
+                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
+                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
+                result.Data.Add("referenceName is missing");
+            }
+            else if (data["referenceName"].ToString().Trim() == string.Empty)
+            {
+                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
+                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
+                result.Data.Add("referenceName is empty");
+            }
+
+            if (data["referenceValue"] == null)
+            {
+                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
+                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
+                result.Data.Add("referenceValue is missing");
+            }
+            else if (data["referenceValue"].ToString().Trim() == string.Empty)
+            {
+                result.Code = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_CODE;
+                result.Description = Mora.Common.Vault.Result.RESULT_GENERAL_BUSINESS_ERROR_DESCRIPTION;
+                result.Data.Add("referenceValue is empty");
             }
             #endregion
 

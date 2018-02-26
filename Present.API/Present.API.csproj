@@ -176,6 +176,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RequestController.cs" />
     <Compile Include="Controllers\SettingController.cs" />
+    <Compile Include="Controllers\Validation.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -251,6 +252,14 @@
     <ProjectReference Include="..\Business.View\Business.View.csproj">
       <Project>{f83d5bdd-dd12-42e3-b462-0445f7ccf0e4}</Project>
       <Name>Business.View</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DBLogger\DBLogger.csproj">
+      <Project>{5513ff90-5bc5-4d52-9c5a-64f5a0456d94}</Project>
+      <Name>DBLogger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ILogger\ILogger.csproj">
+      <Project>{428a816d-27c6-4e73-895d-406cee8b27d7}</Project>
+      <Name>ILogger</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
