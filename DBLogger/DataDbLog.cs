@@ -14,6 +14,9 @@ namespace DBLogger
         [Key]
         public long ID { get; set; }
         [Required]
+        [MaxLength(50)]
+        public string Module { get; set; }
+        [Required]
         [Index(IsUnique = true)]
         public Guid BusinessID { get; set; }
         [Required]

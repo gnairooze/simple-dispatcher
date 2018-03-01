@@ -22,20 +22,20 @@ namespace SimpleDispatcher.Business.Process
         public Data.Model.QueueDbContext DB { private get; set; }
         #endregion
 
-        public Exec.Generic.Execution GetExecution(Vault.ExecType executionType)
+        public Exec.Generic.Execution GetExecution(string module, Vault.ExecType executionType)
         {
             Exec.Generic.Execution exec = null;
 
             switch (executionType)
             {
                 case Vault.ExecType.Generic:
-                    exec = new Exec.Generic.Execution(this.Logger, this.DB);
+                    exec = new Exec.Generic.Execution(module, this.Logger, this.DB);
                     break;
                 case Vault.ExecType.ApiWorker:
-                    exec = new Exec.API.ApiWorkers_Execution(this.Logger, this.DB);
+                    exec = new Exec.API.ApiWorkers_Execution(module, this.Logger, this.DB);
                     break;
                 default:
-                    exec = new Exec.Generic.Execution(this.Logger, this.DB);
+                    exec = new Exec.Generic.Execution(module, this.Logger, this.DB);
                     break;
             }
 

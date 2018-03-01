@@ -21,22 +21,22 @@ namespace SimpleDispatcher.Business.Process
         protected Execution _exec = null;
         protected int _Counter;
         protected Guid _Group;
-        
+        protected string _Module;
         #endregion
 
         #region constructors
-        public Queue(string clientIP, int queueID, int topCount, ILogger.ILog logger, Vault.ExecType executionType )
+        public Queue(string module, string clientIP, int queueID, int topCount, ILogger.ILog logger, Vault.ExecType executionType )
         {
             this.Logger = logger;
-
+            this._Module = module;
+            this.QueueID = queueID;
+            this.TopCount = topCount;
+            
             ExecFactory execfactory = new ExecFactory(this.Logger, this._db);
-            this._exec = execfactory.GetExecution(executionType);
+            this._exec = execfactory.GetExecution(this._Module, executionType);
             this._exec.ExecutionCompleted += _exec_ExecutionCompleted;
 
             loadOperationsSettings(clientIP);
-            
-            this.QueueID = queueID;
-            this.TopCount = topCount;
         }
 
         private void _exec_ExecutionCompleted(object sender, ExecutionCompletedEventArgs e)
@@ -274,11 +274,14 @@ namespace SimpleDispatcher.Business.Process
                  Counter = this._Counter,
                  Group = this._Group,
                  LogType = ILogger.TypeOfLog.Info,
+                 Module = this._Module,
                  ReferenceName = "Class",
                  ReferenceValue = "Business.Process",
                  What = what,
                  When = DateTime.Now,
-                 Who = who
+                 Who = who,
+                 BusinessID = Guid.NewGuid(),
+                 CreatedOn = DateTime.Now 
             };
 
             return this.Logger.Log(model);
@@ -294,11 +297,14 @@ namespace SimpleDispatcher.Business.Process
                 Counter = this._Counter,
                 Group = this._Group,
                 LogType = ILogger.TypeOfLog.Error,
+                Module = this._Module,
                 ReferenceName = "Class",
                 ReferenceValue = "Business.Process",
                 What = errorDetails,
                 When = DateTime.Now,
-                Who = who
+                Who = who,
+                BusinessID = Guid.NewGuid(),
+                CreatedOn = DateTime.Now
             };
 
             return this.Logger.Log(model);

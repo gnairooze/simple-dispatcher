@@ -11,5 +11,8 @@
     <Setting Name="CanLogInfo" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="Module" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">DispatcherAPI101</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

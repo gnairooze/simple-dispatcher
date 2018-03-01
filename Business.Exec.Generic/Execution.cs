@@ -17,13 +17,15 @@ namespace SimpleDispatcher.Business.Exec.Generic
         protected List<IExecutionWorkerAsync> _ExecutionWorkersAsync = new List<IExecutionWorkerAsync>();
         private Guid _ExecutionBusinessID = Guid.NewGuid();
         private int _LoggerCounter = 0;
+        private string _Module;
         #endregion
 
         #region constructors
-        public Execution(ILog logger, Data.Model.QueueDbContext db)
+        public Execution(string module, ILog logger, Data.Model.QueueDbContext db)
         {
             this.Logger = logger;
             this.DB = db;
+            this._Module = module;
 
             loadExecutionWorkers();
             loadExecutionWorkersAsync();
@@ -122,6 +124,7 @@ namespace SimpleDispatcher.Business.Exec.Generic
                 CreatedOn = DateTime.Now,
                 Group = this._ExecutionBusinessID,
                 LogType = TypeOfLog.Info,
+                Module = this._Module,
                 ReferenceName = "Class",
                 ReferenceValue = "Business.Exec.Generic",
                 What = what,

@@ -11,7 +11,7 @@ namespace SimpleDispatcher.Business.Exec.API
     public class ApiWorkers_Execution : Execution
     {
         #region constructors
-        public ApiWorkers_Execution(ILog logger, Data.Model.QueueDbContext db) : base(logger, db)
+        public ApiWorkers_Execution(string module, ILog logger, Data.Model.QueueDbContext db) : base(module, logger, db)
         {
         }
         #endregion

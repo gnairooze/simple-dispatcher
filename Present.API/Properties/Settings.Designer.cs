@@ -49,5 +49,14 @@ namespace SimpleDispatcher.Present.API.Properties {
                 return ((bool)(this["CanLogInfo"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DispatcherAPI101")]
+        public string Module {
+            get {
+                return ((string)(this["Module"]));
+            }
+        }
     }
 }

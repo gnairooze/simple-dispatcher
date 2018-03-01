@@ -9,6 +9,7 @@ namespace ILogger
     public class LogModel
     {
         public long ID { get; set; }
+        public string Module { get; set; }
         public Guid BusinessID { get; set; }
         public Guid Group { get; set; }
         public int Counter { get; set; }

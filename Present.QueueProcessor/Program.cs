@@ -10,9 +10,9 @@ namespace SimpleDispatcher.Present.QueueProcessor
     {
         static void Main(string[] args)
         {
-            Business.Process.Queue queue = new Business.Process.Queue(string.Empty, QueueProcessor.Properties.Settings.Default.QueueID, 
+            Business.Process.Queue queue = new Business.Process.Queue(Present.QueueProcessor.Properties.Settings.Default.Module,string.Empty, QueueProcessor.Properties.Settings.Default.QueueID, 
                 QueueProcessor.Properties.Settings.Default.TopCount, 
-                new ConsoleLogger.SimpleLogger() {
+                new DBLogger.SimpleDbLogger() {
                     CanAddError = Present.QueueProcessor.Properties.Settings.Default.CanAddError,
                     CanAddInfo = Present.QueueProcessor.Properties.Settings.Default.CanAddInfo,
                     CanAddWarning = Present.QueueProcessor.Properties.Settings.Default.CanAddWarning

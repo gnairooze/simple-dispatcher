@@ -8,7 +8,7 @@ namespace SimpleDispatcher.Present.Maintenance
 {
     class Program
     {
-        static ConsoleLogger.SimpleLogger _Logger = new ConsoleLogger.SimpleLogger() {
+        static DBLogger.SimpleDbLogger _Logger = new DBLogger.SimpleDbLogger() {
             CanAddError = Present.Maintenance.Properties.Settings.Default.CanAddError,
             CanAddInfo = Present.Maintenance.Properties.Settings.Default.CanAddInfo,
             CanAddWarning = Present.Maintenance.Properties.Settings.Default.CanAddWarning

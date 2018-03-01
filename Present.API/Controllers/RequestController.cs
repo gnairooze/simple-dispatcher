@@ -27,6 +27,7 @@ namespace SimpleDispatcher.Present.API.Controllers
                 CreatedOn = DateTime.Now,
                 Group = logGuid,
                 LogType = ILogger.TypeOfLog.Info,
+                Module = Present.API.Properties.Settings.Default.Module,
                 ReferenceName = "Class.Method",
                 ReferenceValue = "Present.API.Controllers.Post",
                 What = "First thing. " + inputData,

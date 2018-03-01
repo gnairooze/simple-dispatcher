@@ -18,6 +18,7 @@ namespace DBLogger
                 Group = model.Group,
                 ID = model.ID,
                 LogType = (byte)model.LogType,
+                Module = model.Module,
                 ReferenceName = model.ReferenceName,
                 ReferenceValue = model.ReferenceValue,
                 What = model.What,

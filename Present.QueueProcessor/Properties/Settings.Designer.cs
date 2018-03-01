@@ -67,5 +67,14 @@ namespace SimpleDispatcher.Present.QueueProcessor.Properties {
                 return ((bool)(this["CanAddInfo"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DispatchQueueMgr101")]
+        public string Module {
+            get {
+                return ((string)(this["Module"]));
+            }
+        }
     }
 }

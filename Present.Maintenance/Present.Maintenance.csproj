@@ -77,6 +77,10 @@
       <Project>{5bc57ca9-da23-4f7c-b6df-88e74cfe187f}</Project>
       <Name>ConsoleLogger</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DBLogger\DBLogger.csproj">
+      <Project>{5513ff90-5bc5-4d52-9c5a-64f5a0456d94}</Project>
+      <Name>DBLogger</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ILogger\ILogger.csproj">
       <Project>{428a816d-27c6-4e73-895d-406cee8b27d7}</Project>
       <Name>ILogger</Name>
